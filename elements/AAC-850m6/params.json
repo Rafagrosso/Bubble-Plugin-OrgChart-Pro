@@ -1,0 +1,397 @@
+{
+    "add_hover_pressed": true,
+    "add_is_visible": true,
+    "can_fit_height": true,
+    "can_fit_width": true,
+    "category": "visual elements",
+    "default_dim": {
+        "height": 200,
+        "width": 400
+    },
+    "display": "OrgChart Pro",
+    "events": {
+        "ABQ": {
+            "caption": "organograma_changed",
+            "name": "organograma_drag_mode_changed"
+        }
+    },
+    "fields": {
+        "AAE": {
+            "caption": "Data",
+            "editor": "custom_type",
+            "name": "data",
+            "rank": 1
+        },
+        "AAF": {
+            "caption": "Data Source",
+            "doc": "Lista de registros que montam o organograma",
+            "editor": "DynamicValue",
+            "is_list": true,
+            "name": "source_headers",
+            "rank": 2,
+            "value": "custom_data_AAE"
+        },
+        "AAG": {
+            "caption": "Name Field",
+            "doc": "Campo do banco usado como nome do card",
+            "editor": "custom_field_AAE",
+            "name": "headfieldname",
+            "optional": false,
+            "rank": 3
+        },
+        "AAH": {
+            "caption": "Parent Field",
+            "doc": "Campo que guarda o ID do superior",
+            "editor": "custom_field_AAE",
+            "name": "headparent",
+            "optional": false,
+            "rank": 5,
+            "value": "custom_data_AAE"
+        },
+        "AAI": {
+            "caption": "CAMPOS PERSONALIZADOS EXTRAS - POPUP",
+            "editor": "Label",
+            "name": "CAMPOS PERSONALIZADOS DO POPUP",
+            "optional": true,
+            "rank": 7,
+            "value": "text"
+        },
+        "AAJ": {
+            "caption": "Field 1 Title",
+            "doc": "Título do campo extra 1",
+            "editor": "StaticText",
+            "name": "field_title_1",
+            "optional": true,
+            "rank": 9
+        },
+        "AAK": {
+            "caption": "Field 1 Value",
+            "doc": "Campo da database que define o valor 1",
+            "editor": "custom_field_AAE",
+            "name": "field_value_1",
+            "optional": true,
+            "rank": 10
+        },
+        "AAL": {
+            "caption": "Field 2 Value",
+            "doc": "Campo da database que define o valor 2",
+            "editor": "custom_field_AAE",
+            "name": "field_value_2",
+            "optional": true,
+            "rank": 13
+        },
+        "AAM": {
+            "caption": "Cargo/Função exibida no card/popup",
+            "doc": "Cargo/Função exibida no card/popup",
+            "editor": "custom_field_AAE",
+            "name": "rolefield",
+            "optional": true,
+            "rank": 6
+        },
+        "AAN": {
+            "caption": "Field 3 Title",
+            "doc": "Título do campo extra 3",
+            "editor": "StaticText",
+            "name": "field_title_3",
+            "optional": true,
+            "rank": 14
+        },
+        "AAO": {
+            "caption": "Field 3 Value",
+            "doc": "Campo da database que define o valor 3",
+            "editor": "custom_field_AAE",
+            "name": "field_value_3",
+            "optional": true,
+            "rank": 15
+        },
+        "AAP": {
+            "caption": "Field 2 Title",
+            "doc": "Título do campo extra 2",
+            "editor": "StaticText",
+            "name": "field_title_2",
+            "optional": true,
+            "rank": 12
+        },
+        "AAQ": {
+            "caption": "Field 4 Title",
+            "doc": "Título do campo extra 4",
+            "editor": "StaticText",
+            "name": "field_title_4",
+            "optional": true,
+            "rank": 16
+        },
+        "AAR": {
+            "caption": "Avatar Field",
+            "doc": "Campo com a imagem do funcionário",
+            "editor": "custom_field_AAE",
+            "field_type_restriction": "text_image_file",
+            "name": "avatarfield",
+            "optional": true,
+            "rank": 4,
+            "value": "text"
+        },
+        "AAW": {
+            "caption": "Field 4 Value",
+            "doc": "Campo da database que define o valor 4",
+            "editor": "custom_field_AAE",
+            "name": "field_value_4",
+            "optional": true,
+            "rank": 17
+        },
+        "AAX": {
+            "caption": "Field 5 Value",
+            "doc": "Campo da database que define o valor 5",
+            "editor": "custom_field_AAE",
+            "name": "field_value_5",
+            "optional": true,
+            "rank": 19
+        },
+        "AAY": {
+            "caption": "DATA SOURCE",
+            "editor": "Label",
+            "name": "DATA SOURCE",
+            "rank": 0
+        },
+        "AAd": {
+            "caption": "Field 5 Title",
+            "doc": "Título do campo extra 5",
+            "editor": "StaticText",
+            "name": "field_title_5",
+            "optional": true,
+            "rank": 18
+        },
+        "AAe": {
+            "caption": "Card Width",
+            "default_val": 260,
+            "doc": "Largura do card",
+            "editor": "StaticNumber",
+            "name": "card_width",
+            "optional": true,
+            "rank": 22
+        },
+        "AAf": {
+            "caption": "PROPRIEDADES DE ESTILO",
+            "editor": "Label",
+            "name": "propriedades_de_estilo_do_card",
+            "rank": 20
+        },
+        "AAg": {
+            "caption": "Card Height",
+            "default_val": 95,
+            "doc": "Altura do card",
+            "editor": "StaticNumber",
+            "name": "card_height",
+            "optional": true,
+            "rank": 23
+        },
+        "AAh": {
+            "caption": "Card Background Color",
+            "default_val": "rgba(224,237,242,1)",
+            "doc": "Cor do fundo do card",
+            "editor": "Color",
+            "name": "card_bg_color",
+            "optional": true,
+            "rank": 24
+        },
+        "AAi": {
+            "caption": "Orientation Vertical",
+            "default_val": 8,
+            "doc": "Ajuste vertical de posicionamento do card (para centralizar melhor com o nó).",
+            "editor": "StaticNumber",
+            "name": "card_vertical_offset",
+            "optional": true,
+            "rank": 25
+        },
+        "AAj": {
+            "caption": "Orientation Horizontal",
+            "default_val": 100,
+            "doc": "Ajuste horizontal para o layout horizontal (offset aplicado às coordenadas).",
+            "editor": "StaticNumber",
+            "name": "card_horizontal_offset",
+            "optional": true,
+            "rank": 26
+        },
+        "AAk": {
+            "caption": "Space Horizontal - Extra",
+            "default_val": 14,
+            "doc": "Espaçamento extra usado no layout horizontal.",
+            "editor": "StaticNumber",
+            "name": "horizontal_extra_spacing",
+            "optional": true,
+            "rank": 27
+        },
+        "AAl": {
+            "caption": "Space in cards",
+            "default_val": 220,
+            "doc": "Espaçamento entre irmãos (distância horizontal em modo vertical).",
+            "editor": "StaticNumber",
+            "name": "sibling_spacing",
+            "optional": true,
+            "rank": 28
+        },
+        "AAs": {
+            "caption": "Connector Color",
+            "default_val": "rgba(210,216,220,1)",
+            "doc": "Cor das linhas/conectores entre nós.",
+            "editor": "Color",
+            "name": "connector_color",
+            "optional": true,
+            "rank": 29
+        },
+        "AAt": {
+            "caption": "Connector Width",
+            "default_val": 1.6,
+            "doc": "Espessura das linhas/conectores.",
+            "editor": "StaticNumber",
+            "name": "connector_width",
+            "optional": true,
+            "rank": 30
+        },
+        "AAu": {
+            "caption": "Popup Width",
+            "default_val": 420,
+            "doc": "Largura do painel popup (sidebar) criado dentro do plugin.",
+            "editor": "StaticNumber",
+            "name": "popup_width",
+            "optional": true,
+            "rank": 31
+        },
+        "ABN": {
+            "caption": "Show Field 1 inside card",
+            "default_val": false,
+            "doc": "Exibe o valor do Field 1 dentro do card, abaixo do cargo. Apenas aparece se existir valor no banco.",
+            "editor": "Checkbox",
+            "name": "card_extra_line_1",
+            "rank": 8
+        },
+        "ABO": {
+            "caption": "Show Field 2 inside card",
+            "default_val": false,
+            "doc": "Exibe o valor do Field 2 dentro do card, abaixo do cargo. Apenas aparece se existir valor no banco.",
+            "editor": "Checkbox",
+            "name": "card_extra_line_2",
+            "rank": 11
+        },
+        "ABP": {
+            "caption": "default_orientation",
+            "default_val": "horizontal",
+            "editor": "Dropdown",
+            "name": "default_orientation",
+            "optional": true,
+            "options": "horizontal,vertical",
+            "rank": 21
+        },
+        "ABU": {
+            "caption": "Show drag button",
+            "default_val": true,
+            "doc": "Exibe ou oculta o botão de ativar o modo arrastar na tela do organograma.",
+            "editor": "Checkbox",
+            "name": "show_drag_button",
+            "rank": 32
+        },
+        "ABV": {
+            "caption": "initial_coord_json",
+            "editor": "custom_field_AAE",
+            "name": "initial_coord_json",
+            "optional": true,
+            "rank": 33,
+            "value": "text"
+        },
+        "ABW": {
+            "caption": "apply_initial_coords",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "apply_initial_coords",
+            "rank": 34
+        },
+        "ABX": {
+            "caption": "show search",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_search",
+            "rank": 35
+        },
+        "ABY": {
+            "caption": "show orientation",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_orientation",
+            "rank": 36
+        },
+        "ABZ": {
+            "caption": "show export pdf",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_export_pdf",
+            "rank": 37
+        }
+    },
+    "icon": "ion-android-checkbox-blank",
+    "platform_type": "web",
+    "property_applications": {
+        "Background": true,
+        "Border": true,
+        "BoxShadow": true,
+        "Font": true,
+        "MinWidth": true,
+        "Padding": true,
+        "resizable": true
+    },
+    "states": {
+        "AAS": {
+            "caption": "plugin_status",
+            "doc": "oading, ready, error ou empty.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "plugin_status",
+            "value": "text"
+        },
+        "AAT": {
+            "caption": "plugin_error",
+            "doc": "Retorna detalhes do erro caso o plugin falhe.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "plugin_error",
+            "value": "text"
+        },
+        "AAU": {
+            "caption": "selected_node",
+            "doc": "Retorna os dados completos do nó clicado no organograma.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "selected_node",
+            "value": "text"
+        },
+        "AAV": {
+            "caption": "selected_node_id",
+            "doc": "Retorna somente o ID do nó selecionado.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "selected_node_id",
+            "value": "custom_data_AAE"
+        },
+        "ABS": {
+            "caption": "drag_button_active",
+            "doc": "Retorna \"1\" quando o modo arrastar está ativo e \"0\" quando está desativado.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "drag_button_active",
+            "value": "text"
+        },
+        "ABT": {
+            "caption": "Selected drag coordinate (JSON)",
+            "doc": "Selected drag coordinate (JSON)",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "selected_drag_coord",
+            "value": "text"
+        }
+    },
+    "support_autobinding": false
+}

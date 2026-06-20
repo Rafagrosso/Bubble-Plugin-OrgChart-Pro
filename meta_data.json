@@ -1,0 +1,17 @@
+{
+    "categories": {
+        "0": "analytics",
+        "1": "chart",
+        "2": "data (things)"
+    },
+    "data_tracked": false,
+    "demo_page": "https://orgchart-jsuites.bubbleapps.io/version-test?",
+    "description": "PT-BR\n\nUm componente avançado de organograma interativo, totalmente personalizável, com busca inteligente, destaque visual, popup lateral e suporte a múltiplos níveis hierárquicos. Ideal para exibir equipes, departamentos e estruturas organizacionais de forma clara e profissional.\n\nEN\n\nAn advanced interactive org chart component, fully customizable, featuring smart search, visual highlighting, sidebar popup and support for multiple hierarchical levels. Perfect for displaying teams, departments and organizational structures clearly and professionally.\n\n\n\n\nDEMO:\nhttps://orgchart-jsuites.bubbleapps.io/version-test?\n\n\nEDITOR:\nhttps://bubble.io/page?id=orgchart-jsuites&tab=Design&name=index&elements=bTHJr",
+    "designed_for": "web",
+    "image": "//meta-q.cdn.bubble.io/f1763052177787x771586850690421500/Captura%20de%20tela%202025-11-13%20134242.png",
+    "license": "open_source",
+    "link": "",
+    "name": "OrgChart Pro",
+    "platforms_new": "web",
+    "plugin_instructions": "PT-BR\n\nEnvie uma lista de itens contendo ID, Nome, ID do Supervisor e campos extras opcionais.\n\nAjuste as cores, tamanhos e estilos pelos properties do plugin.\n\nClique em qualquer cartão para abrir o popup lateral com informações personalizadas.\n\nUtilize o campo “Pesquisar...” para localizar colaboradores rapidamente.\n\n\nEN\n\nProvide a list of items containing ID, Name, Parent ID, and optional extra fields.\n\nAdjust colors, sizes, and styles through the plugin’s properties.\n\nClick any card to open the left sidebar popup with customized info.\n\nUse the “Search...” bar to quickly locate specific employees."
+}
