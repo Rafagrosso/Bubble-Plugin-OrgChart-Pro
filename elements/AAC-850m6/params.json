@@ -441,13 +441,13 @@
             "rank": 43
         },
         "ACG": {
-            "caption": "Expanded Levels on Load",
-            "default_val": 0,
-            "doc": "Quantos níveis carregam expandidos (ex.: 3 = mostra os 3 primeiros níveis; os demais carregam colapsados). 0 = tudo expandido.",
+            "caption": "Expand Until Level",
+            "default_val": 2,
+            "doc": "Usado quando Initial Display = 'Expandir até o nível'. Ex.: 3 mostra os níveis 1 a 3; o resto carrega recolhido.",
             "editor": "StaticNumber",
             "name": "initial_expanded_levels",
             "optional": true,
-            "rank": 44
+            "rank": 45
         },
         "ACH": {
             "caption": "Auto Fit on Load",
@@ -455,13 +455,13 @@
             "doc": "Ajusta automaticamente o organograma na tela ao carregar.",
             "editor": "Checkbox",
             "name": "auto_fit_on_render",
-            "rank": 45
+            "rank": 46
         },
         "ACI": {
             "caption": "CARD",
             "editor": "Label",
             "name": "secao_card",
-            "rank": 46
+            "rank": 47
         },
         "ACJ": {
             "caption": "Show Card Info Toggle",
@@ -469,7 +469,7 @@
             "doc": "Mostra o ícone no card para expandir/recolher as informações extras (Fields 1-5) dentro do próprio card.",
             "editor": "Checkbox",
             "name": "card_info_toggle",
-            "rank": 47
+            "rank": 48
         },
         "ACK": {
             "caption": "Avatar Size",
@@ -478,7 +478,7 @@
             "editor": "StaticNumber",
             "name": "card_avatar_size",
             "optional": true,
-            "rank": 48
+            "rank": 49
         },
         "ACL": {
             "caption": "Level Spacing",
@@ -487,34 +487,34 @@
             "editor": "StaticNumber",
             "name": "level_spacing",
             "optional": true,
-            "rank": 49
+            "rank": 50
         },
         "ACM": {
             "caption": "TOOLBAR E AÇÕES",
             "editor": "Label",
             "name": "secao_toolbar",
-            "rank": 50
+            "rank": 51
         },
         "ACN": {
             "caption": "Show Fit Button",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_fit_button",
-            "rank": 51
+            "rank": 52
         },
         "ACO": {
             "caption": "Show Expand/Collapse Buttons",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_expand_collapse_buttons",
-            "rank": 52
+            "rank": 53
         },
         "ACP": {
             "caption": "Show Export PNG",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_export_png",
-            "rank": 53
+            "rank": 54
         },
         "ACQ": {
             "caption": "Show Details Panel",
@@ -522,7 +522,7 @@
             "doc": "Habilita o painel lateral com os detalhes do card.",
             "editor": "Checkbox",
             "name": "show_details_panel",
-            "rank": 54
+            "rank": 55
         },
         "ACR": {
             "caption": "Open Panel on Click",
@@ -530,7 +530,7 @@
             "doc": "Abre o painel lateral ao clicar em um card.",
             "editor": "Checkbox",
             "name": "open_panel_on_click",
-            "rank": 55
+            "rank": 56
         },
         "ACS": {
             "caption": "Open Panel on Search",
@@ -538,7 +538,7 @@
             "doc": "Abre o painel lateral automaticamente ao encontrar um resultado de busca.",
             "editor": "Checkbox",
             "name": "open_panel_on_search",
-            "rank": 56
+            "rank": 57
         },
         "ACT": {
             "caption": "Drag Moves Subtree",
@@ -546,13 +546,13 @@
             "doc": "Ao arrastar um card, move também toda a equipe abaixo dele.",
             "editor": "Checkbox",
             "name": "drag_subtree",
-            "rank": 57
+            "rank": 58
         },
         "ACU": {
             "caption": "BUSCA",
             "editor": "Label",
             "name": "secao_busca",
-            "rank": 58
+            "rank": 59
         },
         "ACV": {
             "caption": "Search Fields",
@@ -561,13 +561,13 @@
             "editor": "StaticText",
             "name": "search_fields",
             "optional": true,
-            "rank": 59
+            "rank": 60
         },
         "ACW": {
             "caption": "EXPORTAÇÃO E OUTROS",
             "editor": "Label",
             "name": "secao_export",
-            "rank": 60
+            "rank": 61
         },
         "ACX": {
             "caption": "Export Scale",
@@ -576,7 +576,7 @@
             "editor": "StaticNumber",
             "name": "export_scale",
             "optional": true,
-            "rank": 61
+            "rank": 62
         },
         "ACY": {
             "caption": "Export Filename Prefix",
@@ -585,7 +585,7 @@
             "editor": "StaticText",
             "name": "export_filename_prefix",
             "optional": true,
-            "rank": 62
+            "rank": 63
         },
         "ACZ": {
             "caption": "Empty Message",
@@ -594,7 +594,7 @@
             "editor": "StaticText",
             "name": "empty_message",
             "optional": true,
-            "rank": 63
+            "rank": 64
         },
         "ACa": {
             "caption": "Fallback Avatar URL",
@@ -602,7 +602,17 @@
             "editor": "StaticText",
             "name": "fallback_avatar_url",
             "optional": true,
-            "rank": 64
+            "rank": 65
+        },
+        "ACb": {
+            "caption": "Initial Display",
+            "default_val": "Tudo expandido",
+            "doc": "Como o organograma carrega: tudo expandido, tudo recolhido (só os cards raiz visíveis) ou expandido até o nível definido abaixo.",
+            "editor": "Dropdown",
+            "name": "initial_display",
+            "optional": true,
+            "options": "Tudo expandido,Tudo recolhido,Expandir até o nível",
+            "rank": 44
         }
     },
     "icon": "ion-android-checkbox-blank",

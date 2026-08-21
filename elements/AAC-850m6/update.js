@@ -151,6 +151,11 @@ function(instance, properties, context) {
       dragSubtree: bool(properties.drag_subtree, true),
       applyInitialCoords: bool(properties.apply_initial_coords, true),
       initialCoords: parseJson(properties.initial_coord_json, null),
+      initialDisplay: (function(v) {
+        if (v.indexOf("recolhido") >= 0 || v.indexOf("collapsed") >= 0) return "collapsed";
+        if (v.indexOf("n\u00edvel") >= 0 || v.indexOf("nivel") >= 0 || v.indexOf("level") >= 0) return "levels";
+        return "expanded";
+      })(str(properties.initial_display || "").toLowerCase()),
       initialLevels: num(properties.initial_expanded_levels, 0, 0, 99),
       searchFields: str(properties.search_fields || "name,role,field_1,field_2,field_3,field_4,field_5").split(",").map(function(x) { return x.trim(); }).filter(Boolean),
       orientation: (str(instance.data._saved_orientation || properties.default_orientation || "vertical").toLowerCase() === "horizontal") ? "horizontal" : "vertical",
@@ -427,9 +432,14 @@ function(instance, properties, context) {
     if (warnings.length) showToast(warnings.length + " aviso(s) nos dados");
 
     if (!instance.data._collapsed_initialized) {
-      if (config.initialLevels > 0) {
+      if (config.initialDisplay === "collapsed") {
         renderedNodes.forEach(function(n) {
-          if ((childMap[n.id] || []).length && n.depth >= config.initialLevels) collapsedMap[n.id] = true;
+          if ((childMap[n.id] || []).length) collapsedMap[n.id] = true;
+        });
+      } else if (config.initialDisplay === "levels" || config.initialLevels > 0) {
+        const lv = Math.max(1, config.initialLevels);
+        renderedNodes.forEach(function(n) {
+          if ((childMap[n.id] || []).length && n.depth >= lv) collapsedMap[n.id] = true;
         });
       }
       instance.data._collapsed_initialized = true;
