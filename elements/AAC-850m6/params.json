@@ -109,7 +109,7 @@
             "value": "custom_data_AAE"
         },
         "AAI": {
-            "caption": "CAMPOS PERSONALIZADOS EXTRAS - POPUP",
+            "caption": "CAMPOS EXTRAS (CARD E PAINEL)",
             "editor": "Label",
             "name": "CAMPOS PERSONALIZADOS DO POPUP",
             "optional": true,
@@ -213,78 +213,77 @@
             "rank": 0
         },
         "AAd": {
-            "caption": "Card Background Color (Custom theme)",
-            "doc": "Usado apenas quando o Tema Visual = Custom.",
+            "caption": "Field 5 Title",
+            "doc": "Título do campo extra 5",
             "editor": "StaticText",
             "name": "field_title_5",
             "optional": true,
             "rank": 18
         },
         "AAe": {
-            "caption": "Card Vertical Offset",
+            "caption": "Card Width",
             "default_val": 260,
-            "doc": "Deslocamento vertical fino dos cards (px).",
+            "doc": "Largura do card (px).",
             "editor": "StaticNumber",
             "name": "card_width",
             "optional": true,
             "rank": 22
         },
         "AAf": {
-            "caption": "Card Horizontal Offset",
-            "doc": "Deslocamento horizontal fino dos cards (px).",
+            "caption": "PROPRIEDADES DE ESTILO",
             "editor": "Label",
             "name": "propriedades_de_estilo_do_card",
             "rank": 20
         },
         "AAg": {
-            "caption": "Extra Horizontal Spacing",
+            "caption": "Card Height",
             "default_val": 95,
-            "doc": "Espaço extra entre colunas no modo horizontal (px).",
+            "doc": "Altura do card fechado (px). O card cresce sozinho quando as informações extras são abertas.",
             "editor": "StaticNumber",
             "name": "card_height",
             "optional": true,
             "rank": 23
         },
         "AAh": {
-            "caption": "Card Background Color",
+            "caption": "Card Background Color (Custom theme)",
             "default_val": "rgba(224,237,242,1)",
-            "doc": "Cor do fundo do card",
+            "doc": "Cor de fundo do card. Usada apenas quando o Tema Visual = Custom.",
             "editor": "Color",
             "name": "card_bg_color",
             "optional": true,
             "rank": 24
         },
         "AAi": {
-            "caption": "Orientation Vertical",
+            "caption": "Card Vertical Offset",
             "default_val": 8,
-            "doc": "Ajuste vertical de posicionamento do card (para centralizar melhor com o nó).",
+            "doc": "Deslocamento vertical fino dos cards (px).",
             "editor": "StaticNumber",
             "name": "card_vertical_offset",
             "optional": true,
             "rank": 25
         },
         "AAj": {
-            "caption": "Orientation Horizontal",
+            "caption": "Card Horizontal Offset",
             "default_val": 100,
-            "doc": "Ajuste horizontal para o layout horizontal (offset aplicado às coordenadas).",
+            "doc": "Deslocamento horizontal fino dos cards (px).",
             "editor": "StaticNumber",
             "name": "card_horizontal_offset",
             "optional": true,
             "rank": 26
         },
         "AAk": {
-            "caption": "Space Horizontal - Extra",
+            "caption": "Extra Horizontal Spacing",
             "default_val": 14,
-            "doc": "Espaçamento extra usado no layout horizontal.",
+            "doc": "Espaço extra entre colunas no modo horizontal (px).",
             "editor": "StaticNumber",
             "name": "horizontal_extra_spacing",
             "optional": true,
             "rank": 27
         },
         "AAl": {
-            "caption": "Details Panel Width",
+            "caption": "Sibling Spacing",
             "default_val": 220,
-            "doc": "Largura do painel lateral de detalhes (px).",
+            "doc": "Distância entre cards do mesmo nível (px).",
             "editor": "StaticNumber",
             "name": "sibling_spacing",
             "optional": true,
@@ -293,7 +292,7 @@
         "AAs": {
             "caption": "Connector Color",
             "default_val": "rgba(210,216,220,1)",
-            "doc": "Cor das linhas/conectores entre nós.",
+            "doc": "Cor das linhas/conectores entre os cards. Deixe vazio para usar a cor do tema.",
             "editor": "Color",
             "name": "connector_color",
             "optional": true,
@@ -309,9 +308,9 @@
             "rank": 30
         },
         "AAu": {
-            "caption": "Popup Width",
+            "caption": "Details Panel Width",
             "default_val": 420,
-            "doc": "Largura do painel popup (sidebar) criado dentro do plugin.",
+            "doc": "Largura do painel lateral de detalhes (px).",
             "editor": "StaticNumber",
             "name": "popup_width",
             "optional": true,
@@ -371,6 +370,7 @@
         "ABX": {
             "caption": "show search",
             "default_val": true,
+            "doc": "Exibe o campo de busca na toolbar.",
             "editor": "Checkbox",
             "name": "show_search",
             "rank": 35
@@ -378,6 +378,7 @@
         "ABY": {
             "caption": "show orientation",
             "default_val": true,
+            "doc": "Exibe os botões de orientação vertical/horizontal.",
             "editor": "Checkbox",
             "name": "show_orientation",
             "rank": 36
@@ -385,6 +386,7 @@
         "ABZ": {
             "caption": "show export pdf",
             "default_val": true,
+            "doc": "Exibe o botão de exportar PDF.",
             "editor": "Checkbox",
             "name": "show_export_pdf",
             "rank": 37
@@ -579,6 +581,7 @@
         "ACY": {
             "caption": "Export Filename Prefix",
             "default_val": "organograma",
+            "doc": "Prefixo do nome do arquivo exportado (PNG/PDF).",
             "editor": "StaticText",
             "name": "export_filename_prefix",
             "optional": true,
@@ -587,6 +590,7 @@
         "ACZ": {
             "caption": "Empty Message",
             "default_val": "Sem dados para exibir",
+            "doc": "Mensagem exibida quando a lista de dados vem vazia.",
             "editor": "StaticText",
             "name": "empty_message",
             "optional": true,
