@@ -11,8 +11,68 @@
     "display": "OrgChart Pro",
     "events": {
         "ABQ": {
-            "caption": "organograma_changed",
+            "caption": "organograma_drag_mode_changed",
             "name": "organograma_drag_mode_changed"
+        },
+        "AEA": {
+            "caption": "organograma_rendered",
+            "name": "organograma_rendered"
+        },
+        "AEB": {
+            "caption": "organograma_node_clicked",
+            "name": "organograma_node_clicked"
+        },
+        "AEC": {
+            "caption": "organograma_error",
+            "name": "organograma_error"
+        },
+        "AED": {
+            "caption": "organograma_search_completed",
+            "name": "organograma_search_completed"
+        },
+        "AEE": {
+            "caption": "organograma_orientation_changed",
+            "name": "organograma_orientation_changed"
+        },
+        "AEF": {
+            "caption": "organograma_node_collapsed",
+            "name": "organograma_node_collapsed"
+        },
+        "AEG": {
+            "caption": "organograma_node_expanded",
+            "name": "organograma_node_expanded"
+        },
+        "AEH": {
+            "caption": "organograma_expanded_all",
+            "name": "organograma_expanded_all"
+        },
+        "AEI": {
+            "caption": "organograma_collapsed_all",
+            "name": "organograma_collapsed_all"
+        },
+        "AEJ": {
+            "caption": "organograma_drag_started",
+            "name": "organograma_drag_started"
+        },
+        "AEK": {
+            "caption": "organograma_drag_finished",
+            "name": "organograma_drag_created"
+        },
+        "AEL": {
+            "caption": "organograma_positions_changed",
+            "name": "organograma_positions_changed"
+        },
+        "AEM": {
+            "caption": "organograma_positions_reset",
+            "name": "organograma_positions_reset"
+        },
+        "AEN": {
+            "caption": "organograma_pdf_exported",
+            "name": "organograma_pdf_exported"
+        },
+        "AEO": {
+            "caption": "organograma_png_exported",
+            "name": "organograma_png_exported"
         }
     },
     "fields": {
@@ -153,32 +213,33 @@
             "rank": 0
         },
         "AAd": {
-            "caption": "Field 5 Title",
-            "doc": "Título do campo extra 5",
+            "caption": "Card Background Color (Custom theme)",
+            "doc": "Usado apenas quando o Tema Visual = Custom.",
             "editor": "StaticText",
             "name": "field_title_5",
             "optional": true,
             "rank": 18
         },
         "AAe": {
-            "caption": "Card Width",
+            "caption": "Card Vertical Offset",
             "default_val": 260,
-            "doc": "Largura do card",
+            "doc": "Deslocamento vertical fino dos cards (px).",
             "editor": "StaticNumber",
             "name": "card_width",
             "optional": true,
             "rank": 22
         },
         "AAf": {
-            "caption": "PROPRIEDADES DE ESTILO",
+            "caption": "Card Horizontal Offset",
+            "doc": "Deslocamento horizontal fino dos cards (px).",
             "editor": "Label",
             "name": "propriedades_de_estilo_do_card",
             "rank": 20
         },
         "AAg": {
-            "caption": "Card Height",
+            "caption": "Extra Horizontal Spacing",
             "default_val": 95,
-            "doc": "Altura do card",
+            "doc": "Espaço extra entre colunas no modo horizontal (px).",
             "editor": "StaticNumber",
             "name": "card_height",
             "optional": true,
@@ -221,9 +282,9 @@
             "rank": 27
         },
         "AAl": {
-            "caption": "Space in cards",
+            "caption": "Details Panel Width",
             "default_val": 220,
-            "doc": "Espaçamento entre irmãos (distância horizontal em modo vertical).",
+            "doc": "Largura do painel lateral de detalhes (px).",
             "editor": "StaticNumber",
             "name": "sibling_spacing",
             "optional": true,
@@ -273,12 +334,13 @@
             "rank": 11
         },
         "ABP": {
-            "caption": "default_orientation",
-            "default_val": "horizontal",
+            "caption": "Default Orientation",
+            "default_val": "vertical",
+            "doc": "Orientação inicial do organograma.",
             "editor": "Dropdown",
             "name": "default_orientation",
             "optional": true,
-            "options": "horizontal,vertical",
+            "options": "vertical,horizontal",
             "rank": 21
         },
         "ABU": {
@@ -290,16 +352,18 @@
             "rank": 32
         },
         "ABV": {
-            "caption": "initial_coord_json",
-            "editor": "custom_field_AAE",
+            "caption": "Initial Coordinates (JSON)",
+            "doc": "JSON com posições salvas dos cards (formato do output all_positions_json ou positions_json). Use para restaurar o layout salvo no Bubble.",
+            "editor": "DynamicValue",
             "name": "initial_coord_json",
             "optional": true,
             "rank": 33,
             "value": "text"
         },
         "ABW": {
-            "caption": "apply_initial_coords",
+            "caption": "Apply Initial Coordinates",
             "default_val": true,
+            "doc": "Se marcado, aplica as coordenadas do campo Initial Coordinates ao carregar.",
             "editor": "Checkbox",
             "name": "apply_initial_coords",
             "rank": 34
@@ -324,6 +388,217 @@
             "editor": "Checkbox",
             "name": "show_export_pdf",
             "rank": 37
+        },
+        "ACA": {
+            "caption": "TEMA VISUAL",
+            "editor": "Label",
+            "name": "secao_tema",
+            "rank": 38
+        },
+        "ACB": {
+            "caption": "Visual Theme",
+            "default_val": "Executive Light",
+            "doc": "Modelos visuais profissionais prontos. Escolha Custom para usar as cores manuais abaixo.",
+            "editor": "Dropdown",
+            "name": "visual_theme",
+            "optional": true,
+            "options": "Executive Light,Corporate Blue,Midnight,Graphite,Emerald,Royal Purple,Warm Sand,Ocean,Minimal Mono,Custom",
+            "rank": 39
+        },
+        "ACC": {
+            "caption": "Accent Color (Custom theme)",
+            "default_val": "rgba(79,70,229,1)",
+            "doc": "Cor de destaque. Usada apenas quando o Tema Visual = Custom.",
+            "editor": "Color",
+            "name": "accent_color",
+            "optional": true,
+            "rank": 40
+        },
+        "ACD": {
+            "caption": "Background Color (Custom theme)",
+            "default_val": "rgba(246,248,251,1)",
+            "doc": "Cor de fundo. Usada apenas quando o Tema Visual = Custom.",
+            "editor": "Color",
+            "name": "background_color",
+            "optional": true,
+            "rank": 41
+        },
+        "ACE": {
+            "caption": "Text Color (Custom theme)",
+            "default_val": "rgba(15,23,42,1)",
+            "doc": "Cor do texto. Usada apenas quando o Tema Visual = Custom.",
+            "editor": "Color",
+            "name": "text_color",
+            "optional": true,
+            "rank": 42
+        },
+        "ACF": {
+            "caption": "CARREGAMENTO INICIAL",
+            "editor": "Label",
+            "name": "secao_carregamento",
+            "rank": 43
+        },
+        "ACG": {
+            "caption": "Expanded Levels on Load",
+            "default_val": 0,
+            "doc": "Quantos níveis carregam expandidos (ex.: 3 = mostra os 3 primeiros níveis; os demais carregam colapsados). 0 = tudo expandido.",
+            "editor": "StaticNumber",
+            "name": "initial_expanded_levels",
+            "optional": true,
+            "rank": 44
+        },
+        "ACH": {
+            "caption": "Auto Fit on Load",
+            "default_val": true,
+            "doc": "Ajusta automaticamente o organograma na tela ao carregar.",
+            "editor": "Checkbox",
+            "name": "auto_fit_on_render",
+            "rank": 45
+        },
+        "ACI": {
+            "caption": "CARD",
+            "editor": "Label",
+            "name": "secao_card",
+            "rank": 46
+        },
+        "ACJ": {
+            "caption": "Show Card Info Toggle",
+            "default_val": true,
+            "doc": "Mostra o ícone no card para expandir/recolher as informações extras (Fields 1-5) dentro do próprio card.",
+            "editor": "Checkbox",
+            "name": "card_info_toggle",
+            "rank": 47
+        },
+        "ACK": {
+            "caption": "Avatar Size",
+            "default_val": 54,
+            "doc": "Tamanho do avatar dentro do card (px).",
+            "editor": "StaticNumber",
+            "name": "card_avatar_size",
+            "optional": true,
+            "rank": 48
+        },
+        "ACL": {
+            "caption": "Level Spacing",
+            "default_val": 160,
+            "doc": "Distância entre níveis hierárquicos (px).",
+            "editor": "StaticNumber",
+            "name": "level_spacing",
+            "optional": true,
+            "rank": 49
+        },
+        "ACM": {
+            "caption": "TOOLBAR E AÇÕES",
+            "editor": "Label",
+            "name": "secao_toolbar",
+            "rank": 50
+        },
+        "ACN": {
+            "caption": "Show Fit Button",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_fit_button",
+            "rank": 51
+        },
+        "ACO": {
+            "caption": "Show Expand/Collapse Buttons",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_expand_collapse_buttons",
+            "rank": 52
+        },
+        "ACP": {
+            "caption": "Show Export PNG",
+            "default_val": true,
+            "editor": "Checkbox",
+            "name": "show_export_png",
+            "rank": 53
+        },
+        "ACQ": {
+            "caption": "Show Details Panel",
+            "default_val": true,
+            "doc": "Habilita o painel lateral com os detalhes do card.",
+            "editor": "Checkbox",
+            "name": "show_details_panel",
+            "rank": 54
+        },
+        "ACR": {
+            "caption": "Open Panel on Click",
+            "default_val": true,
+            "doc": "Abre o painel lateral ao clicar em um card.",
+            "editor": "Checkbox",
+            "name": "open_panel_on_click",
+            "rank": 55
+        },
+        "ACS": {
+            "caption": "Open Panel on Search",
+            "default_val": false,
+            "doc": "Abre o painel lateral automaticamente ao encontrar um resultado de busca.",
+            "editor": "Checkbox",
+            "name": "open_panel_on_search",
+            "rank": 56
+        },
+        "ACT": {
+            "caption": "Drag Moves Subtree",
+            "default_val": true,
+            "doc": "Ao arrastar um card, move também toda a equipe abaixo dele.",
+            "editor": "Checkbox",
+            "name": "drag_subtree",
+            "rank": 57
+        },
+        "ACU": {
+            "caption": "BUSCA",
+            "editor": "Label",
+            "name": "secao_busca",
+            "rank": 58
+        },
+        "ACV": {
+            "caption": "Search Fields",
+            "default_val": "name,role,field_1,field_2,field_3,field_4,field_5",
+            "doc": "Campos considerados na busca, separados por vírgula.",
+            "editor": "StaticText",
+            "name": "search_fields",
+            "optional": true,
+            "rank": 59
+        },
+        "ACW": {
+            "caption": "EXPORTAÇÃO E OUTROS",
+            "editor": "Label",
+            "name": "secao_export",
+            "rank": 60
+        },
+        "ACX": {
+            "caption": "Export Scale",
+            "default_val": 2,
+            "doc": "Escala de resolução do PNG/PDF exportado (1 a 4).",
+            "editor": "StaticNumber",
+            "name": "export_scale",
+            "optional": true,
+            "rank": 61
+        },
+        "ACY": {
+            "caption": "Export Filename Prefix",
+            "default_val": "organograma",
+            "editor": "StaticText",
+            "name": "export_filename_prefix",
+            "optional": true,
+            "rank": 62
+        },
+        "ACZ": {
+            "caption": "Empty Message",
+            "default_val": "Sem dados para exibir",
+            "editor": "StaticText",
+            "name": "empty_message",
+            "optional": true,
+            "rank": 63
+        },
+        "ACa": {
+            "caption": "Fallback Avatar URL",
+            "doc": "Imagem usada quando o colaborador não tem avatar.",
+            "editor": "StaticText",
+            "name": "fallback_avatar_url",
+            "optional": true,
+            "rank": 64
         }
     },
     "icon": "ion-android-checkbox-blank",
@@ -340,7 +615,7 @@
     "states": {
         "AAS": {
             "caption": "plugin_status",
-            "doc": "oading, ready, error ou empty.",
+            "doc": "loading, ready, error ou empty.",
             "initialization_code": {
                 "fn": "function(properties, context) {\n\n\n\n}"
             },
@@ -376,7 +651,7 @@
         },
         "ABS": {
             "caption": "drag_button_active",
-            "doc": "Retorna \"1\" quando o modo arrastar está ativo e \"0\" quando está desativado.",
+            "doc": "1 quando o modo de arrastar cards está ativo, 0 caso contrário.",
             "initialization_code": {
                 "fn": "function(properties, context) {\n\n\n\n}"
             },
@@ -391,6 +666,132 @@
             },
             "name": "selected_drag_coord",
             "value": "text"
+        },
+        "ADA": {
+            "caption": "all_positions_json",
+            "doc": "JSON com as coordenadas de TODOS os cards ([{id,name,parentId,depth,x,y,collapsed,manual}]). Republicado a cada mudança em tela (drag, colapsar, orientação). Salve no Bubble e devolva em Initial Coordinates para restaurar o layout.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "all_positions_json",
+            "value": "text"
+        },
+        "ADB": {
+            "caption": "positions_json",
+            "doc": "JSON apenas com os cards movidos manualmente ([{id,x,y}]).",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "positions_json",
+            "value": "text"
+        },
+        "ADC": {
+            "caption": "selected_parent_id",
+            "doc": "ID do superior do nó selecionado.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "selected_parent_id",
+            "value": "text"
+        },
+        "ADD": {
+            "caption": "node_count",
+            "doc": "Total de nós carregados.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "node_count",
+            "value": "number"
+        },
+        "ADE": {
+            "caption": "search_result_count",
+            "doc": "Quantidade de resultados da última busca.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "search_result_count",
+            "value": "number"
+        },
+        "ADF": {
+            "caption": "last_search_query",
+            "doc": "Último termo pesquisado.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "last_search_query",
+            "value": "text"
+        },
+        "ADG": {
+            "caption": "current_orientation",
+            "doc": "vertical ou horizontal.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "current_orientation",
+            "value": "text"
+        },
+        "ADH": {
+            "caption": "collapsed_ids_json",
+            "doc": "JSON com os IDs dos nós colapsados.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "collapsed_ids_json",
+            "value": "text"
+        },
+        "ADI": {
+            "caption": "current_zoom",
+            "doc": "Nível de zoom atual.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "current_zoom",
+            "value": "text"
+        },
+        "ADJ": {
+            "caption": "last_export_filename",
+            "doc": "Nome do último arquivo exportado.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "last_export_filename",
+            "value": "text"
+        },
+        "ADK": {
+            "caption": "api_instance_id",
+            "doc": "ID da instância para uso via JavaScript: window.OrganogramaPro[id].",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "api_instance_id",
+            "value": "text"
+        },
+        "ADL": {
+            "caption": "warnings_json",
+            "doc": "JSON com avisos de consistência dos dados.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "warnings_json",
+            "value": "text"
+        },
+        "ADM": {
+            "caption": "root_count",
+            "doc": "Quantidade de nós raiz.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "root_count",
+            "value": "number"
+        },
+        "ADN": {
+            "caption": "warning_count",
+            "doc": "Quantidade de avisos nos dados.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "warning_count",
+            "value": "number"
         }
     },
     "support_autobinding": false
