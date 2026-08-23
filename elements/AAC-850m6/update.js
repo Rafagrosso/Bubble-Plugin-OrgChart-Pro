@@ -9,8 +9,7 @@ function(instance, properties, context) {
     const uid = instance.data._org_uid || ("org_" + Math.random().toString(36).slice(2));
     instance.data._org_uid = uid;
 
-    const FALLBACK_AVATAR = properties.fallback_avatar_url || "https://static.vecteezy.com/ti/vetor-gratis/p1/26434417-padrao-avatar-perfil-icone-do-social-meios-de-comunicacao-do-utilizador-foto-vetor.jpg";
-    const noop = function() {};
+    const FALLBACK_AVATAR = properties.fallback_avatar_url || "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#e2e8f0"/><circle cx="48" cy="38" r="16" fill="#94a3b8"/><path d="M16 88c4-18 16-26 32-26s28 8 32 26z" fill="#94a3b8"/></svg>');
     const str = function(v) { return v == null ? "" : String(v); };
     const bool = function(v, d) { return typeof v === "boolean" ? v : d; };
     const num = function(v, d, min, max) {
@@ -38,54 +37,91 @@ function(instance, properties, context) {
         return null;
       }
     };
-    const normalizeHex = function(hex, fallback) {
-      const raw = str(hex || "").trim();
-      if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(raw)) return raw;
-      return fallback;
-    };
-    const hexToRgb = function(hex) {
-      let h = normalizeHex(hex, "#0b6b8b").replace("#", "");
-      if (h.length === 3) h = h.split("").map(function(c) { return c + c; }).join("");
-      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
-    };
-    const rgbToHex = function(r, g, b) {
-      const c = function(v) { return Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"); };
-      return "#" + c(r) + c(g) + c(b);
-    };
-    const shade = function(hex, percent) {
-      const rgb = hexToRgb(hex);
-      const p = percent / 100;
-      const target = p < 0 ? 0 : 255;
-      const abs = Math.abs(p);
-      return rgbToHex(rgb.r + (target - rgb.r) * abs, rgb.g + (target - rgb.g) * abs, rgb.b + (target - rgb.b) * abs);
-    };
     const parseJson = function(value, fallback) {
       if (!value) return fallback;
       if (typeof value === "object") return value;
       try { return JSON.parse(String(value)); } catch (e) { return fallback; }
     };
+    const toCssColor = function(v, fallback) {
+      const raw = str(v).trim();
+      return raw ? raw : fallback;
+    };
+    const hexToRgb = function(hex) {
+      let h = str(hex).replace("#", "");
+      if (/^rgba?\(/.test(str(hex))) {
+        const m = str(hex).match(/[\d.]+/g) || [];
+        return { r: Number(m[0]) || 0, g: Number(m[1]) || 0, b: Number(m[2]) || 0 };
+      }
+      if (h.length === 3) h = h.split("").map(function(c) { return c + c; }).join("");
+      if (!/^[0-9a-f]{6}$/i.test(h)) h = "4f46e5";
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+    };
+    const alpha = function(color, a) {
+      const c = hexToRgb(color);
+      return "rgba(" + c.r + "," + c.g + "," + c.b + "," + a + ")";
+    };
+
+    /* ---------------- THEMES ---------------- */
+    const makeTheme = function(t) {
+      const dark = !!t.dark;
+      const inkA = function(a) { return dark ? "rgba(255,255,255," + a + ")" : "rgba(15,23,42," + a + ")"; };
+      return {
+        "--org-bg": t.bg,
+        "--org-bg-dot": t.dot || inkA(dark ? 0.06 : 0.055),
+        "--org-panel": t.panel || (dark ? "rgba(20,26,40,.82)" : "rgba(255,255,255,.85)"),
+        "--org-panel-border": t.panelBorder || inkA(dark ? 0.10 : 0.08),
+        "--org-field": t.field || (dark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.92)"),
+        "--org-seg": inkA(dark ? 0.08 : 0.045),
+        "--org-hover": inkA(dark ? 0.09 : 0.06),
+        "--org-hover-strong": inkA(dark ? 0.16 : 0.10),
+        "--org-text": t.text,
+        "--org-muted": t.muted,
+        "--org-accent": t.accent,
+        "--org-accent-contrast": t.accentContrast || "#ffffff",
+        "--org-accent-glow": alpha(t.accent, dark ? 0.35 : 0.18),
+        "--org-accent-soft": alpha(t.accent, dark ? 0.18 : 0.10),
+        "--org-card": t.card,
+        "--org-card-border": t.cardBorder || inkA(dark ? 0.12 : 0.08),
+        "--org-card-text": t.cardText || t.text,
+        "--org-card-muted": t.cardMuted || t.muted,
+        "--org-avatar-ring": inkA(dark ? 0.14 : 0.07),
+        "--org-connector": t.connector,
+        "--org-shadow": dark ? "rgba(0,0,0,.38)" : "rgba(15,23,42,.09)",
+        "--org-shadow-strong": dark ? "rgba(0,0,0,.55)" : "rgba(15,23,42,.16)",
+        "--org-drawer": t.drawer || t.card,
+        "--org-toast": dark ? "rgba(226,232,240,.96)" : "rgba(15,23,42,.92)",
+        "--org-field-sep": inkA(dark ? 0.08 : 0.05)
+      };
+    };
+    const THEMES = {
+      "Executive Light": makeTheme({ bg: "#f6f8fb", text: "#0f172a", muted: "#64748b", accent: "#4f46e5", card: "#ffffff", connector: "#cbd5e1" }),
+      "Corporate Blue": makeTheme({ bg: "#f3f7fc", text: "#0c1a2b", muted: "#5b7186", accent: "#1d6fd8", card: "#ffffff", connector: "#c3d3e4" }),
+      "Midnight": makeTheme({ dark: true, bg: "#0b1220", text: "#e5eaf3", muted: "#8b98ad", accent: "#38bdf8", accentContrast: "#052030", card: "#141d31", cardBorder: "rgba(255,255,255,.09)", connector: "#2b3852" }),
+      "Graphite": makeTheme({ dark: true, bg: "#101113", text: "#ececec", muted: "#9a9aa2", accent: "#f59e0b", accentContrast: "#1a1206", card: "#1a1c1f", cardBorder: "rgba(255,255,255,.09)", connector: "#33363b" }),
+      "Emerald": makeTheme({ bg: "#f4faf7", text: "#0b2419", muted: "#5f7a6d", accent: "#059669", card: "#ffffff", connector: "#c6dcd1" }),
+      "Royal Purple": makeTheme({ bg: "#f8f6fd", text: "#1e1b31", muted: "#6f6a8a", accent: "#7c3aed", card: "#ffffff", connector: "#d5cdea" }),
+      "Warm Sand": makeTheme({ bg: "#faf6f0", text: "#2b1c10", muted: "#8a7461", accent: "#c2410c", card: "#fffdf9", connector: "#e0d3c2" }),
+      "Ocean": makeTheme({ bg: "#eef6fa", text: "#093142", muted: "#557687", accent: "#0891b2", card: "#ffffff", connector: "#bcd6e0" }),
+      "Minimal Mono": makeTheme({ bg: "#ffffff", dot: "rgba(0,0,0,.05)", text: "#111111", muted: "#737373", accent: "#111111", card: "#ffffff", cardBorder: "rgba(0,0,0,.12)", connector: "#d4d4d4" })
+    };
+
     const icon = {
       search: '<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 14 15.5l.27.28v.79l4.6 4.58 1.42-1.42-4.6-4.58zM9.5 14A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>',
-      reset: '<svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8a5 5 0 1 1-4.58 7H5.3A7 7 0 1 0 12 6z"/></svg>',
       prev: '<svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>',
       next: '<svg viewBox="0 0 24 24"><path d="M8.6 16.6 13.2 12 8.6 7.4 10 6l6 6-6 6z"/></svg>',
       fit: '<svg viewBox="0 0 24 24"><path d="M5 5h5V3H3v7h2V5zm9-2v2h5v5h2V3h-7zM5 14H3v7h7v-2H5v-5zm14 5h-5v2h7v-7h-2v5z"/></svg>',
-      vertical: '<svg viewBox="0 0 24 24"><path d="M11 3h2v18h-2zM5 7h2v10H5zM17 7h2v10h-2z"/></svg>',
-      horizontal: '<svg viewBox="0 0 24 24"><path d="M3 11h18v2H3zM7 5h10v2H7zM7 17h10v2H7z"/></svg>',
+      expand: '<svg viewBox="0 0 24 24"><path d="M12 5.8 8.4 9.4 7 8l5-5 5 5-1.4 1.4zM12 18.2l3.6-3.6L17 16l-5 5-5-5 1.4-1.4z"/></svg>',
+      collapse: '<svg viewBox="0 0 24 24"><path d="M7 3.6 8.4 2.2 12 5.8l3.6-3.6L17 3.6 12 8.6zM12 15.4l5 5-1.4 1.4L12 18.2l-3.6 3.6L7 20.4z"/></svg>',
+      vertical: '<svg viewBox="0 0 24 24"><path d="M10 2h4v6h-4zM4 14h4v6H4zm6 0h4v6h-4zm6 0h4v6h-4zM11 8h2v3h-2zM5 11h14v2h-5v-2h-4v2H5z"/></svg>',
+      horizontal: '<svg viewBox="0 0 24 24"><path d="M2 10h6v4H2zm12-8h6v4h-6zm0 8h6v4h-6zm0 8h6v4h-6zM8 11h3v2H8zm3-7h2v14h-2v-5h3v-2h-3V9h3V7h-3z"/></svg>',
       pdf: '<svg viewBox="0 0 24 24"><path d="M6 2h8l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V8h4.5zM7 13h2.2a2 2 0 0 1 0 4H8v2H7zm1 1.4v1.2h1.1a.6.6 0 0 0 0-1.2zM12 13h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2zm1.5 1.5v3h.5a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5z"/></svg>',
       image: '<svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.5 8.5A1.5 1.5 0 1 1 7 7a1.5 1.5 0 0 1 1.5 1.5zM5 18l4.2-5.2 3 3.6 2-2.4L19 18z"/></svg>',
-      collapse: '<svg viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg>',
-      expand: '<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>',
-      drag: '<svg viewBox="0 0 24 24"><path d="M13 2v8h8v4h-8v8h-4v-8H1v-4h8V2z"/></svg>',
-      close: "x"
+      drag: '<svg viewBox="0 0 24 24"><path d="M13 6.99h3L12 3 8 6.99h3v4.01H6.99v-3L3 12l3.99 4v-3H11v4.01H8L12 21l4-3.99h-3V13h4.01v3L21 12l-3.99-4v3H13z"/></svg>',
+      chevron: '<svg viewBox="0 0 24 24"><path d="M12 15.4 5.6 9 7 7.6l5 5 5-5L18.4 9z"/></svg>',
+      people: '<svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0a8 8 0 0 0-1 .07 4.2 4.2 0 0 1 2 3.43V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg>'
     };
 
     setStatus("loading", "");
-    safePublish("selected_node", "");
-    safePublish("selected_node_id", "");
-    safePublish("selected_parent_id", "");
-    safePublish("selected_drag_coord", "");
-    safePublish("search_result_count", 0);
 
     if (!canvas) {
       setStatus("error", "Canvas not available");
@@ -97,7 +133,9 @@ function(instance, properties, context) {
       return;
     }
 
+    /* ---------------- CONFIG ---------------- */
     const config = {
+      theme: str(properties.visual_theme || "Executive Light"),
       showSearch: bool(properties.show_search, true),
       showOrientation: bool(properties.show_orientation, true),
       showExportPdf: bool(properties.show_export_pdf, true),
@@ -106,35 +144,37 @@ function(instance, properties, context) {
       showExpandCollapse: bool(properties.show_expand_collapse_buttons, true),
       showDrag: bool(properties.show_drag_button, true),
       showPanel: bool(properties.show_details_panel, true),
-      openPanelOnSearch: bool(properties.open_panel_on_search, true),
+      infoToggle: bool(properties.card_info_toggle, true),
+      openPanelOnSearch: bool(properties.open_panel_on_search, false),
       openPanelOnClick: bool(properties.open_panel_on_click, true),
-      includeToolbarExport: bool(properties.export_include_toolbar, false),
       autoFit: bool(properties.auto_fit_on_render, true),
       dragSubtree: bool(properties.drag_subtree, true),
+      applyInitialCoords: bool(properties.apply_initial_coords, true),
+      initialCoords: parseJson(properties.initial_coord_json, null),
+      initialDisplay: (function(v) {
+        if (v.indexOf("recolhido") >= 0 || v.indexOf("collapsed") >= 0) return "collapsed";
+        if (v.indexOf("n\u00edvel") >= 0 || v.indexOf("nivel") >= 0 || v.indexOf("level") >= 0) return "levels";
+        return "expanded";
+      })(str(properties.initial_display || "").toLowerCase()),
+      initialLevels: num(properties.initial_expanded_levels, 0, 0, 99),
       searchFields: str(properties.search_fields || "name,role,field_1,field_2,field_3,field_4,field_5").split(",").map(function(x) { return x.trim(); }).filter(Boolean),
       orientation: (str(instance.data._saved_orientation || properties.default_orientation || "vertical").toLowerCase() === "horizontal") ? "horizontal" : "vertical",
       nodeW: num(properties.card_width, 270, 160, 520),
-      nodeH: num(properties.card_height, 104, 70, 260),
-      avatarSize: num(properties.card_avatar_size, 58, 28, 140),
-      levelSpacing: num(properties.level_spacing, 150, 70, 500),
-      siblingSpacing: num(properties.sibling_spacing, 230, 100, 700),
-      horizontalExtra: num(properties.horizontal_extra_spacing, 250, 0, 900),
-      cardVOffset: num(properties.card_vertical_offset, 8, -200, 200),
-      cardHOffset: num(properties.card_horizontal_offset, 100, -300, 500),
-      connectorColor: properties.connector_color || "#d2d8dc",
-      connectorWidth: num(properties.connector_width, 1.6, 0.5, 8),
-      bgColor: normalizeHex(properties.background_color, "#f7fbfc"),
-      cardColor: normalizeHex(properties.card_bg_color, "#0b6b8b"),
-      accentColor: normalizeHex(properties.accent_color, "#0b6b8b"),
-      textColor: properties.text_color || "#0b1b2b",
+      nodeH: num(properties.card_height, 96, 70, 260),
+      avatarSize: num(properties.card_avatar_size, 54, 28, 140),
+      levelSpacing: num(properties.level_spacing, 160, 70, 500),
+      siblingSpacing: num(properties.sibling_spacing, 300, 100, 700),
+      horizontalExtra: num(properties.horizontal_extra_spacing, 120, 0, 900),
+      cardVOffset: num(properties.card_vertical_offset, 0, -200, 200),
+      cardHOffset: num(properties.card_horizontal_offset, 0, -300, 500),
+      connectorColor: toCssColor(properties.connector_color, ""),
+      connectorWidth: num(properties.connector_width, 1.8, 0.5, 8),
       popupWidth: num(properties.popup_width, 430, 280, 760),
       exportScale: num(properties.export_scale, 2, 1, 4),
       filenamePrefix: str(properties.export_filename_prefix || "organograma"),
-      selectedNodeId: str(properties.selected_node_id || instance.data._saved_selected_id || ""),
-      initialCollapsed: parseJson(properties.initial_collapsed_ids, []),
-      savedPositions: parseJson(properties.positions_json, null),
-      emptyMessage: str(properties.empty_message || "No data"),
-      noRootMessage: str(properties.no_root_message || "No root found"),
+      emptyMessage: str(properties.empty_message || "Sem dados para exibir"),
+      extraLine1: bool(properties.card_extra_line_1, false),
+      extraLine2: bool(properties.card_extra_line_2, false),
       title1: str(properties.field_title_1 || "Field 1"),
       title2: str(properties.field_title_2 || "Field 2"),
       title3: str(properties.field_title_3 || "Field 3"),
@@ -144,31 +184,40 @@ function(instance, properties, context) {
     instance.data._saved_orientation = config.orientation;
 
     let collapsedMap = instance.data._collapsed_map || {};
-    if (Array.isArray(config.initialCollapsed) && !instance.data._collapsed_initialized) {
-      config.initialCollapsed.forEach(function(id) { if (id != null) collapsedMap[String(id)] = true; });
-      instance.data._collapsed_initialized = true;
-    }
+    let infoMap = instance.data._info_map || {};
+    instance.data._info_map = infoMap;
     let dragActive = !!instance.data._drag_button_active;
-    let selectedId = config.selectedNodeId;
+    let selectedId = str(instance.data._saved_selected_id || "");
     let searchResults = [];
     let currentResultIndex = -1;
     let renderedNodes = [];
     let roots = [];
     let childMap = {};
     let nodeMap = {};
+    let allPositions = [];
     let svg;
     let container;
     let zoom;
-    let dragLayer;
 
+    /* ---------------- ROOT + THEME ---------------- */
     canvas.innerHTML = "";
     const wrapper = doc.createElement("div");
     wrapper.id = uid;
-    wrapper.className = "org-pro-root";
-    wrapper.style.setProperty("--org-bg", config.bgColor);
-    wrapper.style.setProperty("--org-accent", config.accentColor);
-    wrapper.style.setProperty("--org-accent-strong", shade(config.accentColor, -20));
-    wrapper.style.setProperty("--org-text", config.textColor);
+    wrapper.className = "org-pro-root" + (config.orientation === "horizontal" ? " org-h" : "");
+    const themeVars = THEMES[config.theme] || null;
+    if (themeVars) {
+      Object.keys(themeVars).forEach(function(k) { wrapper.style.setProperty(k, themeVars[k]); });
+    } else {
+      const custom = makeTheme({
+        bg: toCssColor(properties.background_color, "#f6f8fb"),
+        text: toCssColor(properties.text_color, "#0f172a"),
+        muted: alpha(toCssColor(properties.text_color, "#0f172a"), 0.6),
+        accent: toCssColor(properties.accent_color, "#4f46e5"),
+        card: toCssColor(properties.card_bg_color, "#ffffff"),
+        connector: toCssColor(properties.connector_color, "#cbd5e1")
+      });
+      Object.keys(custom).forEach(function(k) { wrapper.style.setProperty(k, custom[k]); });
+    }
     canvas.appendChild(wrapper);
 
     const canvasLayer = doc.createElement("div");
@@ -188,35 +237,55 @@ function(instance, properties, context) {
       toast._timer = setTimeout(function() { toast.classList.remove("is-visible"); }, ms || 2400);
     }
     function empty(message, isError) {
-      canvasLayer.innerHTML = "<div class='" + (isError ? "org-pro-error" : "org-pro-empty") + "'>" + esc(message) + "</div>";
+      canvasLayer.innerHTML = "<div class='" + (isError ? "org-pro-error" : "org-pro-empty") + "'>" + icon.people + "<span>" + esc(message) + "</span></div>";
     }
+
+    /* ---------------- TOOLBAR ---------------- */
     function renderToolbar() {
       const toolbar = doc.createElement("div");
       toolbar.className = "org-pro-toolbar org-no-export";
       toolbar.innerHTML =
-        (config.showSearch ? '<input class="org-pro-search" id="' + uid + '_search" type="search" placeholder="Pesquisar..." autocomplete="off">' : "") +
-        '<div class="org-pro-actions">' +
-          (config.showSearch ? '<button class="org-pro-btn" id="' + uid + '_search_btn" title="Buscar">' + icon.search + '</button><button class="org-pro-btn" id="' + uid + '_reset_btn" title="Limpar busca">' + icon.reset + '</button>' : "") +
+        (config.showSearch
+          ? '<div class="org-pro-searchwrap">' + icon.search +
+            '<input class="org-pro-search" id="' + uid + '_search" type="search" placeholder="Pesquisar..." autocomplete="off">' +
+            '<button class="org-pro-search-clear" id="' + uid + '_clear_btn" title="Limpar busca">&times;</button></div>' +
+            '<div class="org-pro-nav" id="' + uid + '_nav">' +
+            '<button class="org-pro-btn" id="' + uid + '_prev_btn" title="Resultado anterior">' + icon.prev + '</button>' +
+            '<span class="org-pro-nav-count" id="' + uid + '_count">0/0</span>' +
+            '<button class="org-pro-btn" id="' + uid + '_next_btn" title="Pr&oacute;ximo resultado">' + icon.next + '</button></div>'
+          : "") +
+        '<span class="org-pro-spacer"></span>' +
+        '<div class="org-pro-group">' +
           (config.showFit ? '<button class="org-pro-btn" id="' + uid + '_fit_btn" title="Ajustar na tela">' + icon.fit + '</button>' : "") +
-          (config.showExpandCollapse ? '<button class="org-pro-btn" id="' + uid + '_expand_btn" title="Expandir tudo">' + icon.expand + '</button><button class="org-pro-btn" id="' + uid + '_collapse_btn" title="Colapsar tudo">' + icon.collapse + '</button>' : "") +
-          (config.showExportPdf ? '<button class="org-pro-btn" id="' + uid + '_pdf_btn" title="Exportar PDF">' + icon.pdf + '</button>' : "") +
-          (config.showExportPng ? '<button class="org-pro-btn" id="' + uid + '_png_btn" title="Exportar PNG">' + icon.image + '</button>' : "") +
+          (config.showExpandCollapse
+            ? '<button class="org-pro-btn" id="' + uid + '_expand_btn" title="Expandir tudo">' + icon.expand + '</button>' +
+              '<button class="org-pro-btn" id="' + uid + '_collapse_btn" title="Recolher tudo">' + icon.collapse + '</button>'
+            : "") +
         '</div>' +
-        '<div class="org-pro-nav org-pro-hidden" id="' + uid + '_nav"><button class="org-pro-btn" id="' + uid + '_prev_btn" title="Anterior">' + icon.prev + '</button><span class="org-pro-nav-count" id="' + uid + '_count">0/0</span><button class="org-pro-btn" id="' + uid + '_next_btn" title="Proximo">' + icon.next + '</button></div>' +
-        (config.showOrientation ? '<div class="org-pro-orientation"><button class="org-pro-btn org-pro-btn-text" id="' + uid + '_vertical_btn" title="Vertical">' + icon.vertical + '<span>Vertical</span></button><button class="org-pro-btn org-pro-btn-text" id="' + uid + '_horizontal_btn" title="Horizontal">' + icon.horizontal + '<span>Horizontal</span></button></div>' : "");
+        (config.showOrientation
+          ? '<div class="org-pro-seg" title="Orienta&ccedil;&atilde;o">' +
+            '<button class="org-pro-btn" id="' + uid + '_vertical_btn" title="Vertical">' + icon.vertical + '</button>' +
+            '<button class="org-pro-btn" id="' + uid + '_horizontal_btn" title="Horizontal">' + icon.horizontal + '</button></div>'
+          : "") +
+        ((config.showExportPng || config.showExportPdf)
+          ? '<div class="org-pro-group">' +
+            (config.showExportPng ? '<button class="org-pro-btn" id="' + uid + '_png_btn" title="Exportar PNG">' + icon.image + '</button>' : "") +
+            (config.showExportPdf ? '<button class="org-pro-btn" id="' + uid + '_pdf_btn" title="Exportar PDF">' + icon.pdf + '</button>' : "") +
+            '</div>'
+          : "") +
+        (config.showDrag ? '<div class="org-pro-divider"></div><button class="org-pro-btn" id="' + uid + '_drag_btn" title="Mover cards">' + icon.drag + '<span class="org-pro-btn-label">Mover</span></button>' : "");
       wrapper.appendChild(toolbar);
 
-      if (config.showDrag) {
-        const floating = doc.createElement("div");
-        floating.className = "org-pro-floating-left org-no-export";
-        floating.innerHTML = '<div class="org-pro-drag-panel"><button class="org-pro-btn org-pro-btn-text" id="' + uid + '_drag_btn" title="Mover cards">' + icon.drag + '<span>Arrastar</span></button></div>';
-        wrapper.appendChild(floating);
-      }
-
       const qs = function(id) { return wrapper.querySelector("#" + uid + "_" + id); };
-      if (qs("search_btn")) qs("search_btn").onclick = function() { search(qs("search").value); };
-      if (qs("search")) qs("search").addEventListener("keydown", function(e) { if (e.key === "Enter") search(e.target.value); });
-      if (qs("reset_btn")) qs("reset_btn").onclick = resetSearch;
+      const input = qs("search");
+      if (input) {
+        input.addEventListener("keydown", function(e) { if (e.key === "Enter") search(input.value); });
+        input.addEventListener("input", function() {
+          input.parentNode.classList.toggle("has-value", !!input.value);
+          if (!input.value) resetSearch(false);
+        });
+      }
+      if (qs("clear_btn")) qs("clear_btn").onclick = function() { resetSearch(true); };
       if (qs("fit_btn")) qs("fit_btn").onclick = function() { fitToChart(true); };
       if (qs("expand_btn")) qs("expand_btn").onclick = expandAll;
       if (qs("collapse_btn")) qs("collapse_btn").onclick = collapseAll;
@@ -226,27 +295,22 @@ function(instance, properties, context) {
       if (qs("next_btn")) qs("next_btn").onclick = nextResult;
       if (qs("vertical_btn")) qs("vertical_btn").onclick = function() { setOrientation("vertical"); };
       if (qs("horizontal_btn")) qs("horizontal_btn").onclick = function() { setOrientation("horizontal"); };
-      if (qs("drag_btn")) {
-        qs("drag_btn").onclick = function() { setDragActive(!dragActive); };
-        qs("drag_btn").classList.toggle("is-active", dragActive);
-      }
+      if (qs("drag_btn")) qs("drag_btn").onclick = function() { setDragActive(!dragActive); };
       updateToolbarState();
     }
     renderToolbar();
 
+    /* ---------------- DATA ---------------- */
     function readPositionsMap(raw) {
       const map = {};
       if (!raw) return map;
+      const push = function(id, x, y) {
+        if (id && Number.isFinite(Number(x)) && Number.isFinite(Number(y))) map[String(id)] = { x: Number(x), y: Number(y) };
+      };
       if (Array.isArray(raw)) {
-        raw.forEach(function(item) {
-          const id = item && item.id != null ? String(item.id) : "";
-          if (id && Number.isFinite(Number(item.x)) && Number.isFinite(Number(item.y))) map[id] = { x: Number(item.x), y: Number(item.y) };
-        });
+        raw.forEach(function(item) { if (item) push(item.id, item.x, item.y); });
       } else if (typeof raw === "object") {
-        Object.keys(raw).forEach(function(id) {
-          const item = raw[id];
-          if (item && Number.isFinite(Number(item.x)) && Number.isFinite(Number(item.y))) map[String(id)] = { x: Number(item.x), y: Number(item.y) };
-        });
+        Object.keys(raw).forEach(function(id) { const item = raw[id]; if (item) push(id, item.x, item.y); });
       }
       return map;
     }
@@ -255,7 +319,7 @@ function(instance, properties, context) {
       const total = src && typeof src.length === "function" ? src.length() : 0;
       if (!total) return { nodes: [], warnings: [] };
       const raw = src.get(0, total);
-      const positions = readPositionsMap(config.savedPositions);
+      const positions = config.applyInitialCoords ? readPositionsMap(config.initialCoords) : {};
       const warnings = [];
       const seen = {};
       const nodes = [];
@@ -281,11 +345,17 @@ function(instance, properties, context) {
           field_3: str(getField(item, properties.field_value_3) || ""),
           field_4: str(getField(item, properties.field_value_4) || ""),
           field_5: str(getField(item, properties.field_value_5) || ""),
+          depth: 0,
           __original: item
         };
-        if (positions[id]) {
+        if (positions[id] && !instance.data._positions_applied) {
           node._manualX = positions[id].x;
           node._manualY = positions[id].y;
+        }
+        const kept = instance.data._manual_positions && instance.data._manual_positions[id];
+        if (kept) {
+          node._manualX = kept.x;
+          node._manualY = kept.y;
         }
         nodes.push(node);
       }
@@ -316,6 +386,16 @@ function(instance, properties, context) {
       nodes.forEach(visit);
       return warnings;
     }
+    function assignDepths() {
+      const queue = roots.map(function(r) { return { node: r, depth: 1 }; });
+      while (queue.length) {
+        const cur = queue.shift();
+        cur.node.depth = cur.depth;
+        (childMap[cur.node.id] || []).forEach(function(child) {
+          queue.push({ node: child, depth: cur.depth + 1 });
+        });
+      }
+    }
     function buildData() {
       const loaded = loadNodes();
       renderedNodes = loaded.nodes;
@@ -329,6 +409,8 @@ function(instance, properties, context) {
         childMap[parent].push(n);
       });
       roots = childMap[null] || [];
+      assignDepths();
+      if (renderedNodes.length) instance.data._positions_applied = true;
       const warnings = loaded.warnings.concat(hierarchyWarnings);
       safePublish("node_count", renderedNodes.length);
       safePublish("root_count", roots.length);
@@ -343,12 +425,28 @@ function(instance, properties, context) {
       return;
     }
     if (!roots.length) {
-      empty(config.noRootMessage, true);
+      empty("Hierarquia inválida: nenhum nó raiz encontrado", true);
       setStatus("error", "Hierarchy error: no root");
       return;
     }
-    if (warnings.length) showToast(warnings.length + " warning(s) in data");
+    if (warnings.length) showToast(warnings.length + " aviso(s) nos dados");
 
+    if (!instance.data._collapsed_initialized) {
+      if (config.initialDisplay === "collapsed") {
+        renderedNodes.forEach(function(n) {
+          if ((childMap[n.id] || []).length) collapsedMap[n.id] = true;
+        });
+      } else if (config.initialDisplay === "levels" || config.initialLevels > 0) {
+        const lv = Math.max(1, config.initialLevels);
+        renderedNodes.forEach(function(n) {
+          if ((childMap[n.id] || []).length && n.depth >= lv) collapsedMap[n.id] = true;
+        });
+      }
+      instance.data._collapsed_initialized = true;
+      instance.data._collapsed_map = collapsedMap;
+    }
+
+    /* ---------------- SVG / ZOOM ---------------- */
     const width = Math.max(320, canvas.clientWidth || instance.canvas.width() || 900);
     const height = Math.max(260, canvas.clientHeight || instance.canvas.height() || 620);
     svg = D3.select(canvasLayer).append("svg")
@@ -357,7 +455,6 @@ function(instance, properties, context) {
       .attr("height", "100%")
       .attr("viewBox", [0, 0, width, height]);
     container = svg.append("g").attr("class", "org-pro-container");
-    dragLayer = container.append("g").attr("class", "org-pro-drag-layer");
     zoom = D3.zoom().scaleExtent([0.12, 3.5]).on("zoom", function(e) {
       container.attr("transform", e.transform);
       svg.node().__zoom = e.transform;
@@ -370,12 +467,31 @@ function(instance, properties, context) {
     svg.on("click.clear", function() {
       if (dragActive) return;
       clearSelection();
-      resetSearch(false);
     });
 
+    /* ---------------- LAYOUT ---------------- */
     function buildTree(n) {
       const kids = childMap[n.id] || [];
       return Object.assign({}, n, { children: collapsedMap[n.id] ? null : kids.map(buildTree) });
+    }
+    function detailFields(n) {
+      return [
+        { label: config.title1, value: n.field_1 },
+        { label: config.title2, value: n.field_2 },
+        { label: config.title3, value: n.field_3 },
+        { label: config.title4, value: n.field_4 },
+        { label: config.title5, value: n.field_5 }
+      ].filter(function(f) { return str(f.value).trim(); });
+    }
+    function detailsHeight(n) {
+      const rows = detailFields(n).length;
+      return rows ? rows * 36 + 20 : 0;
+    }
+    function isInfoOpen(n) {
+      return config.infoToggle && !!infoMap[n.id] && detailFields(n).length > 0;
+    }
+    function foHeight(n) {
+      return config.nodeH + (isInfoOpen(n) ? detailsHeight(n) : 0);
     }
     function displayX(d) {
       return config.orientation === "vertical" ? d.x : d.y + config.cardHOffset;
@@ -387,40 +503,73 @@ function(instance, properties, context) {
       return "translate(" + (displayX(d) - config.nodeW / 2) + "," + (displayY(d) - config.nodeH / 2 + config.cardVOffset) + ")";
     }
     function linkPath(d) {
+      let sx, sy, tx, ty;
       if (config.orientation === "vertical") {
-        const sx = d.source.x;
-        const sy = d.source.y + config.nodeH / 2 + config.cardVOffset;
-        const tx = d.target.x;
-        const ty = d.target.y - config.nodeH / 2 + config.cardVOffset;
-        const cy = (sy + ty) / 2;
-        return "M" + sx + "," + sy + " C " + sx + "," + cy + " " + tx + "," + cy + " " + tx + "," + ty;
+        sx = d.source.x;
+        sy = d.source.y + config.nodeH / 2 + config.cardVOffset;
+        tx = d.target.x;
+        ty = d.target.y - config.nodeH / 2 + config.cardVOffset;
+        const my = (sy + ty) / 2;
+        if (Math.abs(tx - sx) < 2) return "M" + sx + "," + sy + " L" + tx + "," + ty;
+        const dir = tx > sx ? 1 : -1;
+        const r = Math.min(10, Math.abs(tx - sx) / 2, Math.abs(ty - my));
+        return "M" + sx + "," + sy +
+          " L" + sx + "," + (my - r) +
+          " Q" + sx + "," + my + " " + (sx + dir * r) + "," + my +
+          " L" + (tx - dir * r) + "," + my +
+          " Q" + tx + "," + my + " " + tx + "," + (my + r) +
+          " L" + tx + "," + ty;
       }
-      const sxh = d.source.y + config.nodeW / 2 + config.cardHOffset;
-      const syh = d.source.x + config.cardVOffset;
-      const txh = d.target.y - config.nodeW / 2 + config.cardHOffset;
-      const tyh = d.target.x + config.cardVOffset;
-      const cx = (sxh + txh) / 2;
-      return "M" + sxh + "," + syh + " C " + cx + "," + syh + " " + cx + "," + tyh + " " + txh + "," + tyh;
+      sx = d.source.y + config.nodeW / 2 + config.cardHOffset;
+      sy = d.source.x + config.cardVOffset;
+      tx = d.target.y - config.nodeW / 2 + config.cardHOffset;
+      ty = d.target.x + config.cardVOffset;
+      const mx = (sx + tx) / 2;
+      if (Math.abs(ty - sy) < 2) return "M" + sx + "," + sy + " L" + tx + "," + ty;
+      const dirY = ty > sy ? 1 : -1;
+      const r2 = Math.min(10, Math.abs(ty - sy) / 2, Math.abs(tx - mx));
+      return "M" + sx + "," + sy +
+        " L" + (mx - r2) + "," + sy +
+        " Q" + mx + "," + sy + " " + mx + "," + (sy + dirY * r2) +
+        " L" + mx + "," + (ty - dirY * r2) +
+        " Q" + mx + "," + ty + " " + (mx + r2) + "," + ty +
+        " L" + tx + "," + ty;
     }
     function cardHtml(d) {
       const n = d.data;
-      const hasChildren = (childMap[n.id] || []).length > 0;
+      const kids = (childMap[n.id] || []).length;
       const isCollapsed = !!collapsedMap[n.id];
       const highlighted = searchResults.indexOf(n.id) >= 0;
       const selected = selectedId === n.id;
-      const bottom = shade(config.cardColor, -22);
-      const bg = "linear-gradient(180deg,#fff 0%," + shade(config.cardColor, 80) + " 42%," + bottom + " 100%)";
-      const textColor = highlighted ? "#ffffff" : config.textColor;
-      const extra = properties.card_extra_line_1 && n.field_1 ? '<div class="org-pro-card-extra" style="color:' + (highlighted ? "rgba(255,255,255,.90)" : "var(--org-muted)") + '">' + esc(n.field_1) + '</div>' : "";
-      return '<div xmlns="http://www.w3.org/1999/xhtml" class="org-pro-card' + (highlighted ? " is-highlighted" : "") + (selected ? " is-selected" : "") + '" style="background:' + bg + ';color:' + textColor + '">' +
-        '<img class="org-pro-avatar" src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';" style="width:' + config.avatarSize + 'px;height:' + config.avatarSize + 'px">' +
-        '<div class="org-pro-card-main"><div class="org-pro-card-name">' + esc(n.name || "(sem nome)") + '</div><div class="org-pro-card-role" style="color:' + (highlighted ? "rgba(255,255,255,.88)" : "var(--org-muted)") + '">' + esc(n.role) + '</div>' + extra + '</div>' +
-        (hasChildren ? '<button type="button" class="org-pro-collapse" data-node-id="' + esc(n.id) + '" title="' + (isCollapsed ? "Expandir" : "Colapsar") + '">' + (isCollapsed ? ">" : "v") + '</button>' : "") +
+      const fields = detailFields(n);
+      const infoOpen = isInfoOpen(n);
+      const extra1 = config.extraLine1 && n.field_1 ? '<div class="org-pro-card-extra">' + esc(n.field_1) + '</div>' : "";
+      const extra2 = config.extraLine2 && n.field_2 ? '<div class="org-pro-card-extra">' + esc(n.field_2) + '</div>' : "";
+      const details = infoOpen
+        ? '<div class="org-pro-card-details">' + fields.map(function(f) {
+            return '<div class="org-pro-card-field"><div class="org-pro-card-field-label">' + esc(f.label) + '</div><div class="org-pro-card-field-value">' + esc(f.value) + '</div></div>';
+          }).join("") + '</div>'
+        : "";
+      return '<div xmlns="http://www.w3.org/1999/xhtml" class="org-pro-card' +
+        (highlighted ? " is-highlighted" : "") + (selected ? " is-selected" : "") + (infoOpen ? " is-info-open" : "") + '">' +
+        '<div class="org-pro-card-head">' +
+          '<img class="org-pro-avatar" src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';" style="width:' + config.avatarSize + 'px;height:' + config.avatarSize + 'px">' +
+          '<div class="org-pro-card-main">' +
+            '<div class="org-pro-card-name">' + esc(n.name || "(sem nome)") + '</div>' +
+            (n.role ? '<div class="org-pro-card-role">' + esc(n.role) + '</div>' : "") +
+            extra1 + extra2 +
+          '</div>' +
+        '</div>' +
+        details +
+        (config.infoToggle && fields.length ? '<button type="button" class="org-pro-info-btn" data-info-id="' + esc(n.id) + '" title="' + (infoOpen ? "Recolher informações" : "Ver informações") + '">' + icon.chevron + '</button>' : "") +
+        (kids ? '<button type="button" class="org-pro-kids' + (isCollapsed ? " is-collapsed" : "") + '" data-node-id="' + esc(n.id) + '" title="' + (isCollapsed ? "Expandir equipe" : "Recolher equipe") + '">' + icon.chevron + '<span>' + kids + '</span></button>' : "") +
         '</div>';
     }
+
+    /* ---------------- RENDER ---------------- */
     function render() {
       container.selectAll("*").remove();
-      dragLayer = container.append("g").attr("class", "org-pro-drag-layer");
+      allPositions = [];
       let offsetX = 0;
       roots.forEach(function(root) {
         const tree = D3.tree().nodeSize(config.orientation === "vertical" ? [config.siblingSpacing, config.levelSpacing] : [config.levelSpacing, config.siblingSpacing + config.horizontalExtra]);
@@ -442,7 +591,7 @@ function(instance, properties, context) {
           .data(h.links())
           .join("path")
           .attr("class", "org-pro-link")
-          .attr("stroke", config.connectorColor)
+          .attr("stroke", config.connectorColor || null)
           .attr("stroke-width", config.connectorWidth)
           .attr("d", linkPath);
 
@@ -457,12 +606,26 @@ function(instance, properties, context) {
         nodeSel.append("foreignObject")
           .attr("class", "org-pro-card-fo")
           .attr("width", config.nodeW)
-          .attr("height", config.nodeH)
+          .attr("height", function(d) { return foHeight(d.data); })
           .html(cardHtml);
+
+        nodeSel.each(function(d) {
+          const n = nodeMap[d.data.id];
+          allPositions.push({
+            id: d.data.id,
+            name: d.data.name,
+            parentId: d.data.parentId || "",
+            depth: n ? n.depth : 0,
+            x: Math.round(d.x * 100) / 100,
+            y: Math.round(d.y * 100) / 100,
+            collapsed: !!collapsedMap[d.data.id],
+            manual: !!(n && Number.isFinite(n._manualX))
+          });
+        });
 
         nodeSel.on("click", function(event, d) {
           if (dragActive) return;
-          if (event.target && event.target.closest && event.target.closest(".org-pro-collapse")) return;
+          if (event.target && event.target.closest && event.target.closest(".org-pro-kids,.org-pro-info-btn")) return;
           event.stopPropagation();
           selectNode(d, true);
         });
@@ -471,43 +634,50 @@ function(instance, properties, context) {
           event.stopPropagation();
           beginCardDrag(event, d);
         });
-        nodeSel.selectAll(".org-pro-collapse").nodes().forEach(function(btn) {
+        nodeSel.selectAll(".org-pro-kids").nodes().forEach(function(btn) {
           btn.onclick = function(ev) {
             ev.stopPropagation();
             toggleCollapse(btn.getAttribute("data-node-id"));
           };
         });
+        nodeSel.filter(function(d) { return isInfoOpen(d.data) || d.data.id === selectedId; }).raise();
+        nodeSel.selectAll(".org-pro-info-btn").nodes().forEach(function(btn) {
+          btn.onclick = function(ev) {
+            ev.stopPropagation();
+            toggleInfo(btn.getAttribute("data-info-id"));
+          };
+        });
         offsetX += span + (config.orientation === "horizontal" ? config.horizontalExtra : 90);
       });
-      if (selectedId && findNode(selectedId)) markSelected(selectedId);
+      if (selectedId && !findNode(selectedId).empty()) markSelected(selectedId);
+      svg.classed("is-dragmode", dragActive);
+      publishAllPositions();
     }
-    function findNode(id) {
-      return container.selectAll(".org-pro-node").filter(function(d) { return d && d.data && d.data.id === id; });
+
+    /* ---------------- OUTPUTS ---------------- */
+    function publishAllPositions() {
+      safePublish("all_positions_json", JSON.stringify(allPositions));
+      safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
+      safeTrigger("organograma_positions_changed");
     }
-    function markSelected(id) {
-      container.selectAll(".org-pro-card").classed("is-selected", false);
-      const sel = findNode(id);
-      if (!sel.empty()) sel.select(".org-pro-card").classed("is-selected", true);
+    function currentPositions() {
+      return renderedNodes.filter(function(n) { return Number.isFinite(n._manualX) && Number.isFinite(n._manualY); }).map(function(n) {
+        return { id: n.id, x: Math.round(n._manualX * 100) / 100, y: Math.round(n._manualY * 100) / 100 };
+      });
     }
-    function clearSelection() {
-      selectedId = "";
-      instance.data._saved_selected_id = "";
-      instance.data._saved_sidebar_open = false;
-      wrapper.querySelectorAll(".org-pro-drawer").forEach(function(el) { el.remove(); });
-      safePublish("selected_node", "");
-      safePublish("selected_node_id", "");
-      safePublish("selected_parent_id", "");
-      markSelected("");
+    function persistManualPositions() {
+      const map = {};
+      renderedNodes.forEach(function(n) {
+        if (Number.isFinite(n._manualX) && Number.isFinite(n._manualY)) map[n.id] = { x: n._manualX, y: n._manualY };
+      });
+      instance.data._manual_positions = map;
     }
-    function selectNode(d, userAction) {
-      selectedId = d.data.id;
-      instance.data._saved_selected_id = selectedId;
-      safePublish("selected_node_id", d.data.id);
-      safePublish("selected_parent_id", d.data.parentId || "");
-      safePublish("selected_node", JSON.stringify(toPublicNode(d.data)));
-      markSelected(selectedId);
-      if (config.showPanel && config.openPanelOnClick) openPanel(d);
-      if (userAction) safeTrigger("organograma_node_clicked");
+    function publishPositions(activeId) {
+      persistManualPositions();
+      const positions = currentPositions();
+      const active = activeId && nodeMap[activeId] ? nodeMap[activeId] : null;
+      safePublish("positions_json", JSON.stringify(positions));
+      safePublish("selected_drag_coord", active && Number.isFinite(active._manualX) ? JSON.stringify({ id: active.id, x: Math.round(active._manualX * 100) / 100, y: Math.round(active._manualY * 100) / 100, at: new Date().toISOString() }) : "");
     }
     function toPublicNode(n) {
       return {
@@ -521,56 +691,60 @@ function(instance, properties, context) {
         field_3: n.field_3 || "",
         field_4: n.field_4 || "",
         field_5: n.field_5 || "",
+        depth: n.depth || 0,
         x: Number.isFinite(n._manualX) ? Math.round(n._manualX * 100) / 100 : null,
         y: Number.isFinite(n._manualY) ? Math.round(n._manualY * 100) / 100 : null
       };
     }
+
+    /* ---------------- SELECTION ---------------- */
+    function findNode(id) {
+      return container.selectAll(".org-pro-node").filter(function(d) { return d && d.data && d.data.id === id; });
+    }
+    function markSelected(id) {
+      container.selectAll(".org-pro-card").classed("is-selected", false);
+      const sel = findNode(id);
+      if (!sel.empty()) sel.select(".org-pro-card").classed("is-selected", true);
+    }
+    function clearSelection() {
+      selectedId = "";
+      instance.data._saved_selected_id = "";
+      wrapper.querySelectorAll(".org-pro-drawer").forEach(function(el) { el.remove(); });
+      safePublish("selected_node", "");
+      safePublish("selected_node_id", "");
+      safePublish("selected_parent_id", "");
+      markSelected("");
+    }
+    function selectNode(d, userAction) {
+      selectedId = d.data.id;
+      instance.data._saved_selected_id = selectedId;
+      safePublish("selected_node_id", d.data.id);
+      safePublish("selected_parent_id", d.data.parentId || "");
+      safePublish("selected_node", JSON.stringify(toPublicNode(nodeMap[d.data.id] || d.data)));
+      markSelected(selectedId);
+      if (config.showPanel && config.openPanelOnClick) openPanel(d);
+      if (userAction) safeTrigger("organograma_node_clicked");
+    }
     function openPanel(d) {
       wrapper.querySelectorAll(".org-pro-drawer").forEach(function(el) { el.remove(); });
       const n = d.data;
-      const fields = [
-        { label: config.title1, value: n.field_1 },
-        { label: config.title2, value: n.field_2 },
-        { label: config.title3, value: n.field_3 },
-        { label: config.title4, value: n.field_4 },
-        { label: config.title5, value: n.field_5 }
-      ].filter(function(f) { return str(f.value).trim(); });
-      const coord = {
-        id: n.id,
-        x: Math.round((Number.isFinite(n._manualX) ? n._manualX : d.x) * 100) / 100,
-        y: Math.round((Number.isFinite(n._manualY) ? n._manualY : d.y) * 100) / 100,
-        at: new Date().toISOString()
-      };
+      const fields = detailFields(n);
       const drawer = doc.createElement("div");
       drawer.className = "org-pro-drawer org-no-export";
       drawer.style.width = Math.min(config.popupWidth, wrapper.clientWidth || config.popupWidth) + "px";
       drawer.innerHTML =
-        '<button class="org-pro-drawer-close" type="button" title="Fechar">' + icon.close + '</button>' +
-        '<div class="org-pro-profile"><img src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';"><h2>' + esc(n.name || "(sem nome)") + '</h2><p>' + esc(n.role || "") + '</p></div>' +
+        '<button class="org-pro-drawer-close" type="button" title="Fechar">&times;</button>' +
+        '<div class="org-pro-profile"><img src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';"><h2>' + esc(n.name || "(sem nome)") + '</h2>' + (n.role ? '<p>' + esc(n.role) + '</p>' : "") + '</div>' +
         '<div class="org-pro-field-list">' +
-        (fields.length ? fields.map(function(f) { return '<div class="org-pro-field"><div class="org-pro-field-label">' + esc(f.label) + '</div><div class="org-pro-field-value">' + esc(f.value) + '</div></div>'; }).join("") : '<div class="org-pro-field-value" style="padding:16px;text-align:center;color:var(--org-muted)">Sem informacoes adicionais</div>') +
-        '</div>' +
-        '<div class="org-pro-field"><div class="org-pro-field-label">Coordenada JSON</div><textarea class="org-pro-codebox" id="' + uid + '_coord">' + esc(JSON.stringify(coord)) + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px"><button class="org-pro-btn org-pro-btn-text" id="' + uid + '_coord_cancel">Cancelar</button><button class="org-pro-btn org-pro-btn-text is-active" id="' + uid + '_coord_save">Salvar</button></div></div>';
+        (fields.length
+          ? fields.map(function(f) { return '<div class="org-pro-field"><div class="org-pro-field-label">' + esc(f.label) + '</div><div class="org-pro-field-value">' + esc(f.value) + '</div></div>'; }).join("")
+          : '<div class="org-pro-field-value" style="padding:16px;text-align:center;color:var(--org-muted)">Sem informações adicionais</div>') +
+        '</div>';
       wrapper.appendChild(drawer);
-      instance.data._saved_sidebar_open = true;
       drawer.querySelector(".org-pro-drawer-close").onclick = clearSelection;
-      drawer.querySelector("#" + uid + "_coord_cancel").onclick = function() { drawer.remove(); };
-      drawer.querySelector("#" + uid + "_coord_save").onclick = function() {
-        const raw = drawer.querySelector("#" + uid + "_coord").value;
-        const parsed = parseJson(raw, null);
-        if (!parsed || !Number.isFinite(Number(parsed.x)) || !Number.isFinite(Number(parsed.y))) {
-          showToast("Coordenada invalida");
-          return;
-        }
-        const target = nodeMap[n.id];
-        target._manualX = Number(parsed.x);
-        target._manualY = Number(parsed.y);
-        publishPositions(n.id);
-        render();
-        drawer.remove();
-        safeTrigger("organograma_drag_created");
-      };
     }
+
+    /* ---------------- TOOLBAR STATE ---------------- */
     function updateToolbarState() {
       const vertical = wrapper.querySelector("#" + uid + "_vertical_btn");
       const horizontal = wrapper.querySelector("#" + uid + "_horizontal_btn");
@@ -578,6 +752,7 @@ function(instance, properties, context) {
       if (vertical) vertical.classList.toggle("is-active", config.orientation === "vertical");
       if (horizontal) horizontal.classList.toggle("is-active", config.orientation === "horizontal");
       if (drag) drag.classList.toggle("is-active", dragActive);
+      wrapper.classList.toggle("org-h", config.orientation === "horizontal");
       safePublish("current_orientation", config.orientation);
       safePublish("drag_button_active", dragActive ? "1" : "0");
     }
@@ -593,20 +768,26 @@ function(instance, properties, context) {
       dragActive = !!next;
       instance.data._drag_button_active = dragActive;
       updateToolbarState();
+      svg.classed("is-dragmode", dragActive);
       safeTrigger("organograma_drag_mode_changed");
     }
+
+    /* ---------------- COLLAPSE / INFO ---------------- */
     function toggleCollapse(id) {
       collapsedMap[id] = !collapsedMap[id];
       instance.data._collapsed_map = collapsedMap;
       render();
-      safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
       safeTrigger(collapsedMap[id] ? "organograma_node_collapsed" : "organograma_node_expanded");
+    }
+    function toggleInfo(id) {
+      infoMap[id] = !infoMap[id];
+      instance.data._info_map = infoMap;
+      render();
     }
     function expandAll() {
       collapsedMap = {};
       instance.data._collapsed_map = collapsedMap;
       render();
-      safePublish("collapsed_ids_json", "[]");
       safeTrigger("organograma_expanded_all");
     }
     function collapseAll() {
@@ -615,14 +796,19 @@ function(instance, properties, context) {
       roots.forEach(function(r) { collapsedMap[r.id] = false; });
       instance.data._collapsed_map = collapsedMap;
       render();
-      safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
+      fitToChart(true);
       safeTrigger("organograma_collapsed_all");
     }
+
+    /* ---------------- SEARCH ---------------- */
     function resetSearch(refit) {
       searchResults = [];
       currentResultIndex = -1;
       const input = wrapper.querySelector("#" + uid + "_search");
-      if (input) input.value = "";
+      if (input) {
+        input.value = "";
+        input.parentNode.classList.remove("has-value");
+      }
       updateSearchNav();
       render();
       safePublish("search_result_count", 0);
@@ -632,7 +818,7 @@ function(instance, properties, context) {
       const nav = wrapper.querySelector("#" + uid + "_nav");
       const count = wrapper.querySelector("#" + uid + "_count");
       if (!nav || !count) return;
-      nav.classList.toggle("org-pro-hidden", searchResults.length <= 1);
+      nav.classList.toggle("is-on", searchResults.length > 0);
       count.textContent = searchResults.length ? (currentResultIndex + 1) + "/" + searchResults.length : "0/0";
     }
     function openAncestors(id) {
@@ -658,7 +844,7 @@ function(instance, properties, context) {
       safePublish("last_search_query", q);
       safeTrigger("organograma_search_completed");
       if (!searchResults.length) {
-        showToast("Nada encontrado");
+        showToast("Nenhum resultado encontrado");
         updateSearchNav();
         render();
         return;
@@ -679,7 +865,8 @@ function(instance, properties, context) {
         instance.data._saved_selected_id = id;
         safePublish("selected_node_id", id);
         safePublish("selected_parent_id", d.data.parentId || "");
-        safePublish("selected_node", JSON.stringify(toPublicNode(d.data)));
+        safePublish("selected_node", JSON.stringify(toPublicNode(nodeMap[id] || d.data)));
+        markSelected(id);
         if (config.showPanel && config.openPanelOnSearch) openPanel(d);
       }
       updateSearchNav();
@@ -688,41 +875,31 @@ function(instance, properties, context) {
     function prevResult() { goToResult(currentResultIndex - 1); }
     function focusNode(d) {
       try {
-        const bbox = findNode(d.data.id).node().getBBox();
-        const cx = bbox.x + bbox.width / 2;
-        const cy = bbox.y + bbox.height / 2;
-        const scale = Math.max(0.25, Math.min(2.6, Math.min(width / (config.nodeW * 2.6), height / (config.nodeH * 2.6))));
-        const t = D3.zoomIdentity.translate(width / 2 - scale * cx, height / 2 - scale * cy).scale(scale);
-        svg.transition().duration(420).call(zoom.transform, t);
+        const node = findNode(d.data.id).node();
+        const svgRect = svg.node().getBoundingClientRect();
+        const t = svg.node().__zoom || D3.zoomIdentity;
+        const rect = node.getBoundingClientRect();
+        const cx = (rect.left + rect.width / 2 - svgRect.left - t.x) / t.k;
+        const cy = (rect.top + rect.height / 2 - svgRect.top - t.y) / t.k;
+        const scale = Math.max(0.4, Math.min(1.4, Math.min(width / (config.nodeW * 2.4), height / (config.nodeH * 3.4))));
+        const nt = D3.zoomIdentity.translate(width / 2 - scale * cx, height / 2 - scale * cy).scale(scale);
+        svg.transition().duration(480).ease(D3.easeCubicOut).call(zoom.transform, nt);
       } catch (e) {}
     }
     function fitToChart(animated) {
       try {
         const bbox = container.node().getBBox();
-        const pad = 90;
-        const scale = Math.max(0.12, Math.min(2.6, Math.min((width - pad) / Math.max(1, bbox.width), (height - pad) / Math.max(1, bbox.height))));
+        const pad = 110;
+        const scale = Math.max(0.12, Math.min(2.2, Math.min((width - pad) / Math.max(1, bbox.width), (height - pad) / Math.max(1, bbox.height))));
         const tx = width / 2 - scale * (bbox.x + bbox.width / 2);
-        const ty = height / 2 - scale * (bbox.y + bbox.height / 2);
+        const ty = (height + 66) / 2 - scale * (bbox.y + bbox.height / 2);
         const t = D3.zoomIdentity.translate(tx, ty).scale(scale);
-        const target = animated ? svg.transition().duration(520) : svg;
+        const target = animated ? svg.transition().duration(520).ease(D3.easeCubicOut) : svg;
         target.call(zoom.transform, t);
       } catch (e) {}
     }
-    function currentPositions() {
-      return renderedNodes.filter(function(n) { return Number.isFinite(n._manualX) && Number.isFinite(n._manualY); }).map(function(n) {
-        return { id: n.id, x: Math.round(n._manualX * 100) / 100, y: Math.round(n._manualY * 100) / 100 };
-      });
-    }
-    function publishPositions(activeId) {
-      const positions = currentPositions();
-      const active = activeId && nodeMap[activeId] ? nodeMap[activeId] : null;
-      safePublish("positions_json", JSON.stringify(positions));
-      safePublish("selected_drag_coord", active ? JSON.stringify({ id: active.id, x: Math.round(active._manualX * 100) / 100, y: Math.round(active._manualY * 100) / 100, at: new Date().toISOString() }) : "");
-    }
-    function screenToWorld(pt) {
-      const t = svg.node().__zoom || D3.zoomIdentity;
-      return [(pt[0] - t.x) / t.k, (pt[1] - t.y) / t.k];
-    }
+
+    /* ---------------- DRAG ---------------- */
     let dragState = null;
     function collectDragNodes(d) {
       const out = [];
@@ -735,9 +912,11 @@ function(instance, properties, context) {
     }
     function beginCardDrag(event, d) {
       const pt = D3.pointer(event, svg.node());
-      dragState = { start: pt, nodes: collectDragNodes(d).map(function(x) {
-        return { id: x.data.id, x: x.x, y: x.y };
-      }), activeId: d.data.id };
+      dragState = {
+        start: pt,
+        nodes: collectDragNodes(d).map(function(x) { return { id: x.data.id, x: x.x, y: x.y }; }),
+        activeId: d.data.id
+      };
       svg.on("mousemove.dragCard", moveCardDrag);
       svg.on("mouseup.dragCard", endCardDrag);
       safeTrigger("organograma_drag_started");
@@ -762,6 +941,7 @@ function(instance, properties, context) {
         }
         return nodeTransform(d);
       });
+      container.selectAll(".org-pro-link").attr("d", linkPath);
     }
     function endCardDrag() {
       if (!dragState) return;
@@ -774,23 +954,26 @@ function(instance, properties, context) {
     }
     function resetPositions() {
       renderedNodes.forEach(function(n) { delete n._manualX; delete n._manualY; });
+      instance.data._manual_positions = {};
       publishPositions("");
       render();
       fitToChart(true);
       safeTrigger("organograma_positions_reset");
     }
+
+    /* ---------------- EXPORT ---------------- */
     async function exportChart(kind) {
       try {
         if (!html2canvasRef) throw new Error("html2canvas was not loaded");
         if (kind === "pdf" && !jsPDFRef) throw new Error("jsPDF was not loaded");
         const oldTransform = svg.node().__zoom || D3.zoomIdentity;
         fitToChart(false);
-        await new Promise(function(resolve) { setTimeout(resolve, 80); });
+        await new Promise(function(resolve) { setTimeout(resolve, 120); });
         const canvasEl = await html2canvasRef(wrapper, {
           scale: config.exportScale,
           useCORS: true,
-          backgroundColor: config.bgColor,
-          ignoreElements: function(el) { return !config.includeToolbarExport && el.classList && el.classList.contains("org-no-export"); }
+          backgroundColor: getComputedStyle(wrapper).getPropertyValue("--org-bg").trim() || "#ffffff",
+          ignoreElements: function(el) { return el.classList && el.classList.contains("org-no-export"); }
         });
         svg.call(zoom.transform, oldTransform);
         const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
@@ -819,6 +1002,7 @@ function(instance, properties, context) {
       }
     }
 
+    /* ---------------- BOOT ---------------- */
     render();
     updateToolbarState();
     if (instance.data._saved_transform) {
@@ -851,14 +1035,15 @@ function(instance, properties, context) {
       expandAll: expandAll,
       collapseAll: collapseAll,
       toggleDrag: setDragActive,
+      toggleInfo: toggleInfo,
       resetPositions: resetPositions,
       exportPdf: function() { exportChart("pdf"); },
       exportPng: function() { exportChart("png"); },
       getPositions: currentPositions,
+      getAllPositions: function() { return allPositions.slice(); },
       instanceId: uid
     };
     safePublish("api_instance_id", uid);
-    safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
     safePublish("positions_json", JSON.stringify(currentPositions()));
     setStatus("ready", "");
     safeTrigger("organograma_rendered");
