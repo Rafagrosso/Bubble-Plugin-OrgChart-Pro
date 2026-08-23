@@ -178,8 +178,8 @@ function(instance, properties, context) {
       })(str(properties.connector_style || "").toLowerCase()),
       accentPosition: (function(v) {
         if (v.indexOf("lateral") >= 0 || v.indexOf("left") >= 0 || v.indexOf("side") >= 0) return "side";
-        if (v.indexOf("sem") >= 0 || v.indexOf("none") >= 0) return "none";
-        return "top";
+        if (v.indexOf("superior") >= 0 || v.indexOf("top") >= 0) return "top";
+        return "none";
       })(str(properties.accent_position || "").toLowerCase()),
       cardShadow: (function(v) {
         if (v.indexOf("nenhum") >= 0 || v.indexOf("none") >= 0) return "none";
@@ -219,7 +219,11 @@ function(instance, properties, context) {
       searchFields: str(properties.search_fields || "name,role,field_1,field_2,field_3,field_4,field_5").split(",").map(function(x) { return x.trim(); }).filter(Boolean),
       orientation: (str(instance.data._saved_orientation || properties.default_orientation || "vertical").toLowerCase() === "horizontal") ? "horizontal" : "vertical",
       nodeW: num(properties.card_width, 270, 160, 520),
-      nodeH: num(properties.card_height, 96, 70, 260),
+      nodeH: num(properties.card_height, 96, 56, 260),
+      autoHeight: (function(v) {
+        if (v.indexOf("fixo") >= 0 || v.indexOf("fixed") >= 0) return false;
+        return true;
+      })(str(properties.card_height_mode || "").toLowerCase()),
       avatarSize: num(properties.card_avatar_size, 54, 28, 140),
       levelSpacing: num(properties.level_spacing, 160, 70, 500),
       siblingSpacing: num(properties.sibling_spacing, 300, 100, 700),
@@ -579,13 +583,35 @@ function(instance, properties, context) {
     }
     function detailsHeight(n) {
       const rows = detailFields(n).length;
-      return rows ? rows * 36 + 20 : 0;
+      return rows ? rows * 34 + 18 : 0;
+    }
+    function textBlockHeight(n) {
+      let h = 20;                                   // nome
+      if (n.role) h += 17;
+      if (config.extraLine1 && n.field_1) h += 15;
+      if (config.extraLine2 && n.field_2) h += 15;
+      return h;
+    }
+    function baseCardHeight(n) {
+      if (!config.autoHeight) return config.nodeH;
+      const pad = config.cardLayout === "center" ? 30 : 26;
+      const inner = config.cardLayout === "center"
+        ? (config.cardLayout === "compact" ? 0 : config.avatarSize) + 10 + textBlockHeight(n)
+        : Math.max(config.cardLayout === "compact" ? 0 : config.avatarSize, textBlockHeight(n));
+      return Math.max(58, Math.round(pad + inner));
+    }
+    function maxCardHeight() {
+      if (!config.autoHeight) return config.nodeH;
+      let m = 58;
+      renderedNodes.forEach(function(n) { m = Math.max(m, baseCardHeight(n)); });
+      return m;
     }
     function isInfoOpen(n) {
       return config.infoToggle && !!infoMap[n.id] && detailFields(n).length > 0;
     }
+    let cardH = config.nodeH;
     function foHeight(n) {
-      return config.nodeH + (isInfoOpen(n) ? detailsHeight(n) : 0);
+      return cardH + (isInfoOpen(n) ? detailsHeight(n) : 0);
     }
     function displayX(d) {
       return config.orientation === "vertical" ? d.x : d.y + config.cardHOffset;
@@ -594,22 +620,22 @@ function(instance, properties, context) {
       return config.orientation === "vertical" ? d.y : d.x;
     }
     function nodeTransform(d) {
-      return "translate(" + (displayX(d) - config.nodeW / 2) + "," + (displayY(d) - config.nodeH / 2 + config.cardVOffset) + ")";
+      return "translate(" + (displayX(d) - config.nodeW / 2) + "," + (displayY(d) - cardH / 2 + config.cardVOffset) + ")";
     }
     function linkPath(d) {
       let sx, sy, tx, ty;
       if (config.connectorStyle === "straight") {
         if (config.orientation === "vertical") {
-          return "M" + d.source.x + "," + (d.source.y + config.nodeH / 2 + config.cardVOffset) +
-                 " L" + d.target.x + "," + (d.target.y - config.nodeH / 2 + config.cardVOffset);
+          return "M" + d.source.x + "," + (d.source.y + cardH / 2 + config.cardVOffset) +
+                 " L" + d.target.x + "," + (d.target.y - cardH / 2 + config.cardVOffset);
         }
         return "M" + (d.source.y + config.nodeW / 2 + config.cardHOffset) + "," + (d.source.x + config.cardVOffset) +
                " L" + (d.target.y - config.nodeW / 2 + config.cardHOffset) + "," + (d.target.x + config.cardVOffset);
       }
       if (config.connectorStyle === "curved") {
         if (config.orientation === "vertical") {
-          const csx = d.source.x, csy = d.source.y + config.nodeH / 2 + config.cardVOffset;
-          const ctx = d.target.x, cty = d.target.y - config.nodeH / 2 + config.cardVOffset;
+          const csx = d.source.x, csy = d.source.y + cardH / 2 + config.cardVOffset;
+          const ctx = d.target.x, cty = d.target.y - cardH / 2 + config.cardVOffset;
           const cmy = (csy + cty) / 2;
           return "M" + csx + "," + csy + " C" + csx + "," + cmy + " " + ctx + "," + cmy + " " + ctx + "," + cty;
         }
@@ -620,9 +646,9 @@ function(instance, properties, context) {
       }
       if (config.orientation === "vertical") {
         sx = d.source.x;
-        sy = d.source.y + config.nodeH / 2 + config.cardVOffset;
+        sy = d.source.y + cardH / 2 + config.cardVOffset;
         tx = d.target.x;
-        ty = d.target.y - config.nodeH / 2 + config.cardVOffset;
+        ty = d.target.y - cardH / 2 + config.cardVOffset;
         const my = (sy + ty) / 2;
         if (Math.abs(tx - sx) < 2) return "M" + sx + "," + sy + " L" + tx + "," + ty;
         const dir = tx > sx ? 1 : -1;
@@ -685,9 +711,12 @@ function(instance, properties, context) {
     function render() {
       container.selectAll("*").remove();
       allPositions = [];
+      cardH = maxCardHeight();
+      const gapV = Math.max(config.levelSpacing, cardH + 58);
+      const gapH = Math.max(config.levelSpacing, config.nodeW + 70);
       let offsetX = 0;
       roots.forEach(function(root) {
-        const tree = D3.tree().nodeSize(config.orientation === "vertical" ? [config.siblingSpacing, config.levelSpacing] : [config.levelSpacing, config.siblingSpacing + config.horizontalExtra]);
+        const tree = D3.tree().nodeSize(config.orientation === "vertical" ? [config.siblingSpacing, gapV] : [Math.max(config.levelSpacing, cardH + 34), config.siblingSpacing + config.horizontalExtra]);
         const h = D3.hierarchy(buildTree(root), function(d) { return d.children; });
         tree(h);
         h.descendants().forEach(function(d) {
@@ -853,7 +882,7 @@ function(instance, properties, context) {
         '<div class="org-pro-field-list">' +
         (fields.length
           ? fields.map(function(f) { return '<div class="org-pro-field"><div class="org-pro-field-label">' + esc(f.label) + '</div><div class="org-pro-field-value">' + esc(f.value) + '</div></div>'; }).join("")
-          : '<div class="org-pro-field-value" style="padding:16px;text-align:center;color:var(--org-muted)">Sem informações adicionais</div>') +
+          : '<div class="org-pro-empty-fields">' + icon.people + '<span>Sem informações adicionais</span></div>') +
         '</div>';
       wrapper.appendChild(drawer);
       drawer.querySelector(".org-pro-drawer-close").onclick = clearSelection;
@@ -996,7 +1025,7 @@ function(instance, properties, context) {
         const rect = node.getBoundingClientRect();
         const cx = (rect.left + rect.width / 2 - svgRect.left - t.x) / t.k;
         const cy = (rect.top + rect.height / 2 - svgRect.top - t.y) / t.k;
-        const scale = Math.max(0.4, Math.min(1.4, Math.min(width / (config.nodeW * 2.4), height / (config.nodeH * 3.4))));
+        const scale = Math.max(0.4, Math.min(1.4, Math.min(width / (config.nodeW * 2.4), height / (cardH * 3.4))));
         const nt = D3.zoomIdentity.translate(width / 2 - scale * cx, height / 2 - scale * cy).scale(scale);
         svg.transition().duration(480).ease(D3.easeCubicOut).call(zoom.transform, nt);
       } catch (e) {}

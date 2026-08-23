@@ -238,7 +238,7 @@
         "AAg": {
             "caption": "Card Height",
             "default_val": 95,
-            "doc": "Altura do card fechado (px). O card cresce sozinho quando as informações extras são abertas.",
+            "doc": "Altura do card em px. Usada apenas quando Card Height Mode = Fixo.",
             "editor": "StaticNumber",
             "name": "card_height",
             "optional": true,
@@ -251,7 +251,7 @@
             "editor": "Color",
             "name": "card_bg_color",
             "optional": true,
-            "rank": 24
+            "rank": 25
         },
         "AAi": {
             "caption": "Card Vertical Offset",
@@ -260,7 +260,7 @@
             "editor": "StaticNumber",
             "name": "card_vertical_offset",
             "optional": true,
-            "rank": 25
+            "rank": 26
         },
         "AAj": {
             "caption": "Card Horizontal Offset",
@@ -269,7 +269,7 @@
             "editor": "StaticNumber",
             "name": "card_horizontal_offset",
             "optional": true,
-            "rank": 26
+            "rank": 27
         },
         "AAk": {
             "caption": "Extra Horizontal Spacing",
@@ -278,7 +278,7 @@
             "editor": "StaticNumber",
             "name": "horizontal_extra_spacing",
             "optional": true,
-            "rank": 27
+            "rank": 28
         },
         "AAl": {
             "caption": "Sibling Spacing",
@@ -287,7 +287,7 @@
             "editor": "StaticNumber",
             "name": "sibling_spacing",
             "optional": true,
-            "rank": 28
+            "rank": 29
         },
         "AAs": {
             "caption": "Connector Color",
@@ -296,7 +296,7 @@
             "editor": "Color",
             "name": "connector_color",
             "optional": true,
-            "rank": 29
+            "rank": 30
         },
         "AAt": {
             "caption": "Connector Width",
@@ -305,7 +305,7 @@
             "editor": "StaticNumber",
             "name": "connector_width",
             "optional": true,
-            "rank": 30
+            "rank": 31
         },
         "AAu": {
             "caption": "Details Panel Width",
@@ -314,7 +314,7 @@
             "editor": "StaticNumber",
             "name": "popup_width",
             "optional": true,
-            "rank": 31
+            "rank": 32
         },
         "ABN": {
             "caption": "Show Field 1 inside card",
@@ -348,7 +348,7 @@
             "doc": "Exibe ou oculta o botão de ativar o modo arrastar na tela do organograma.",
             "editor": "Checkbox",
             "name": "show_drag_button",
-            "rank": 32
+            "rank": 33
         },
         "ABV": {
             "caption": "Initial Coordinates (JSON)",
@@ -356,7 +356,7 @@
             "editor": "DynamicValue",
             "name": "initial_coord_json",
             "optional": true,
-            "rank": 33,
+            "rank": 34,
             "value": "text"
         },
         "ABW": {
@@ -365,7 +365,7 @@
             "doc": "Se marcado, aplica as coordenadas do campo Initial Coordinates ao carregar.",
             "editor": "Checkbox",
             "name": "apply_initial_coords",
-            "rank": 34
+            "rank": 35
         },
         "ABX": {
             "caption": "show search",
@@ -373,7 +373,7 @@
             "doc": "Exibe o campo de busca na toolbar.",
             "editor": "Checkbox",
             "name": "show_search",
-            "rank": 35
+            "rank": 36
         },
         "ABY": {
             "caption": "show orientation",
@@ -381,7 +381,7 @@
             "doc": "Exibe os botões de orientação vertical/horizontal.",
             "editor": "Checkbox",
             "name": "show_orientation",
-            "rank": 36
+            "rank": 37
         },
         "ABZ": {
             "caption": "show export pdf",
@@ -389,13 +389,13 @@
             "doc": "Exibe o botão de exportar PDF.",
             "editor": "Checkbox",
             "name": "show_export_pdf",
-            "rank": 37
+            "rank": 38
         },
         "FAA": {
             "caption": "TEMA VISUAL",
             "editor": "Label",
             "name": "secao_tema",
-            "rank": 38
+            "rank": 39
         },
         "FAB": {
             "caption": "Visual Theme",
@@ -405,7 +405,7 @@
             "name": "visual_theme",
             "optional": true,
             "options": "Executive Light,Corporate Blue,Nordic,Ocean,Emerald,Royal Purple,Rose,Warm Sand,Minimal Mono,Midnight,Graphite,Obsidian,Custom",
-            "rank": 39
+            "rank": 40
         },
         "FAC": {
             "caption": "Accent Color (Custom theme)",
@@ -414,7 +414,7 @@
             "editor": "Color",
             "name": "accent_color",
             "optional": true,
-            "rank": 40
+            "rank": 41
         },
         "FAD": {
             "caption": "Background Color (Custom theme)",
@@ -423,7 +423,7 @@
             "editor": "Color",
             "name": "background_color",
             "optional": true,
-            "rank": 41
+            "rank": 42
         },
         "FAE": {
             "caption": "Text Color (Custom theme)",
@@ -432,13 +432,13 @@
             "editor": "Color",
             "name": "text_color",
             "optional": true,
-            "rank": 42
+            "rank": 43
         },
         "FAF": {
             "caption": "CARREGAMENTO INICIAL",
             "editor": "Label",
             "name": "secao_carregamento",
-            "rank": 43
+            "rank": 44
         },
         "FAG": {
             "caption": "Expand Until Level",
@@ -447,7 +447,7 @@
             "editor": "StaticNumber",
             "name": "initial_expanded_levels",
             "optional": true,
-            "rank": 45
+            "rank": 46
         },
         "FAH": {
             "caption": "Auto Fit on Load",
@@ -455,13 +455,13 @@
             "doc": "Ajusta automaticamente o organograma na tela ao carregar.",
             "editor": "Checkbox",
             "name": "auto_fit_on_render",
-            "rank": 46
+            "rank": 47
         },
         "FAI": {
             "caption": "CARD",
             "editor": "Label",
             "name": "secao_card",
-            "rank": 53
+            "rank": 54
         },
         "FAJ": {
             "caption": "Show Card Info Toggle",
@@ -469,7 +469,7 @@
             "doc": "Mostra o ícone no card para expandir/recolher as informações extras (Fields 1-5) dentro do próprio card.",
             "editor": "Checkbox",
             "name": "card_info_toggle",
-            "rank": 54
+            "rank": 55
         },
         "FAK": {
             "caption": "Avatar Size",
@@ -478,7 +478,7 @@
             "editor": "StaticNumber",
             "name": "card_avatar_size",
             "optional": true,
-            "rank": 55
+            "rank": 56
         },
         "FAL": {
             "caption": "Level Spacing",
@@ -487,34 +487,34 @@
             "editor": "StaticNumber",
             "name": "level_spacing",
             "optional": true,
-            "rank": 56
+            "rank": 57
         },
         "FAM": {
             "caption": "TOOLBAR E AÇÕES",
             "editor": "Label",
             "name": "secao_toolbar",
-            "rank": 57
+            "rank": 58
         },
         "FAN": {
             "caption": "Show Fit Button",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_fit_button",
-            "rank": 58
+            "rank": 59
         },
         "FAO": {
             "caption": "Show Expand/Collapse Buttons",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_expand_collapse_buttons",
-            "rank": 59
+            "rank": 60
         },
         "FAP": {
             "caption": "Show Export PNG",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_export_png",
-            "rank": 60
+            "rank": 61
         },
         "FAQ": {
             "caption": "Show Details Panel",
@@ -522,7 +522,7 @@
             "doc": "Habilita o painel lateral com os detalhes do card.",
             "editor": "Checkbox",
             "name": "show_details_panel",
-            "rank": 61
+            "rank": 62
         },
         "FAR": {
             "caption": "Open Panel on Click",
@@ -530,7 +530,7 @@
             "doc": "Abre o painel lateral ao clicar em um card.",
             "editor": "Checkbox",
             "name": "open_panel_on_click",
-            "rank": 65
+            "rank": 66
         },
         "FAS": {
             "caption": "Open Panel on Search",
@@ -538,7 +538,7 @@
             "doc": "Abre o painel lateral automaticamente ao encontrar um resultado de busca.",
             "editor": "Checkbox",
             "name": "open_panel_on_search",
-            "rank": 66
+            "rank": 67
         },
         "FAT": {
             "caption": "Drag Moves Subtree",
@@ -546,13 +546,13 @@
             "doc": "Ao arrastar um card, move também toda a equipe abaixo dele.",
             "editor": "Checkbox",
             "name": "drag_subtree",
-            "rank": 67
+            "rank": 68
         },
         "FAU": {
             "caption": "BUSCA",
             "editor": "Label",
             "name": "secao_busca",
-            "rank": 68
+            "rank": 69
         },
         "FAV": {
             "caption": "Search Fields",
@@ -561,13 +561,13 @@
             "editor": "StaticText",
             "name": "search_fields",
             "optional": true,
-            "rank": 69
+            "rank": 70
         },
         "FAW": {
             "caption": "EXPORTAÇÃO E OUTROS",
             "editor": "Label",
             "name": "secao_export",
-            "rank": 70
+            "rank": 71
         },
         "FAX": {
             "caption": "Export Scale",
@@ -576,7 +576,7 @@
             "editor": "StaticNumber",
             "name": "export_scale",
             "optional": true,
-            "rank": 71
+            "rank": 72
         },
         "FAY": {
             "caption": "Export Filename Prefix",
@@ -585,7 +585,7 @@
             "editor": "StaticText",
             "name": "export_filename_prefix",
             "optional": true,
-            "rank": 72
+            "rank": 73
         },
         "FAZ": {
             "caption": "Empty Message",
@@ -594,7 +594,7 @@
             "editor": "StaticText",
             "name": "empty_message",
             "optional": true,
-            "rank": 73
+            "rank": 74
         },
         "FAa": {
             "caption": "Fallback Avatar URL",
@@ -602,7 +602,7 @@
             "editor": "StaticText",
             "name": "fallback_avatar_url",
             "optional": true,
-            "rank": 74
+            "rank": 75
         },
         "FAb": {
             "caption": "Initial Display",
@@ -612,7 +612,7 @@
             "name": "initial_display",
             "optional": true,
             "options": "Tudo expandido,Tudo recolhido,Expandir até o nível",
-            "rank": 44
+            "rank": 45
         },
         "FAc": {
             "caption": "Card Layout",
@@ -622,7 +622,7 @@
             "name": "card_layout",
             "optional": true,
             "options": "Clássico (avatar à esquerda),Centralizado (avatar em cima),Compacto (sem avatar)",
-            "rank": 47
+            "rank": 48
         },
         "FAd": {
             "caption": "Avatar Shape",
@@ -632,17 +632,17 @@
             "name": "avatar_shape",
             "optional": true,
             "options": "Círculo,Arredondado,Quadrado",
-            "rank": 48
+            "rank": 49
         },
         "FAe": {
             "caption": "Accent Bar Position",
-            "default_val": "Barra superior",
-            "doc": "Onde fica a faixa colorida de destaque do card.",
+            "default_val": "Sem barra",
+            "doc": "Faixa colorida de destaque no card. O padrão é sem barra, que deixa o card mais limpo.",
             "editor": "Dropdown",
             "name": "accent_position",
             "optional": true,
-            "options": "Barra superior,Barra lateral,Sem barra",
-            "rank": 49
+            "options": "Sem barra,Barra superior,Barra lateral",
+            "rank": 50
         },
         "FAf": {
             "caption": "Card Shadow",
@@ -652,7 +652,7 @@
             "name": "card_shadow",
             "optional": true,
             "options": "Suave,Média,Forte,Nenhuma",
-            "rank": 50
+            "rank": 51
         },
         "FAg": {
             "caption": "Color by Level",
@@ -660,7 +660,7 @@
             "doc": "Usa uma cor de destaque diferente para cada nível hierárquico, derivada da cor do tema.",
             "editor": "Checkbox",
             "name": "level_colors",
-            "rank": 51
+            "rank": 52
         },
         "FAh": {
             "caption": "Show Zoom Controls",
@@ -668,7 +668,7 @@
             "doc": "Exibe os botões de aproximar/afastar e o percentual de zoom na toolbar.",
             "editor": "Checkbox",
             "name": "show_zoom_controls",
-            "rank": 62
+            "rank": 63
         },
         "FAi": {
             "caption": "Performance Mode",
@@ -678,7 +678,7 @@
             "name": "performance_mode",
             "optional": true,
             "options": "Automático,Sempre ligado,Desligado",
-            "rank": 63
+            "rank": 64
         },
         "FAj": {
             "caption": "Performance Mode Threshold",
@@ -687,7 +687,17 @@
             "editor": "StaticNumber",
             "name": "performance_threshold",
             "optional": true,
-            "rank": 64
+            "rank": 65
+        },
+        "FBA": {
+            "caption": "Card Height Mode",
+            "default_val": "Automático (ajusta ao conteúdo)",
+            "doc": "No automático o card tem exatamente a altura do conteúdo (recomendado). No fixo, usa o valor de Card Height.",
+            "editor": "Dropdown",
+            "name": "card_height_mode",
+            "optional": true,
+            "options": "Automático (ajusta ao conteúdo),Fixo",
+            "rank": 24
         }
     },
     "icon": "ion-android-checkbox-blank",
