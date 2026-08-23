@@ -140,6 +140,15 @@
 .org-pro-nav{display:none;align-items:center;gap:2px;margin-left:6px}
 .org-pro-nav.is-on{display:flex}
 .org-pro-nav .org-pro-btn{height:30px;min-width:30px;padding:0 6px;border-radius:8px}
+.org-pro-zoom-level{
+  min-width:46px;
+  text-align:center;
+  color:var(--org-muted,#64748b);
+  font-size:11.5px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  user-select:none;
+}
 .org-pro-nav-count{
   min-width:44px;
   text-align:center;
@@ -173,6 +182,14 @@
   border-radius:16px 16px 0 0;
   background:linear-gradient(90deg,var(--org-accent,#4f46e5),var(--org-accent-glow,rgba(79,70,229,.25)));
 }
+.org-accent-side .org-pro-card::before{
+  top:0;left:0;right:auto;bottom:0;
+  width:4px;height:auto;
+  border-radius:16px 0 0 16px;
+  background:linear-gradient(180deg,var(--org-accent,#4f46e5),var(--org-accent-glow,rgba(79,70,229,.25)));
+}
+.org-accent-none .org-pro-card::before{display:none}
+.org-accent-side .org-pro-card-head{padding-left:20px}
 .org-pro-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 16px 38px var(--org-shadow-strong,rgba(15,23,42,.16))}
 .org-pro-card.is-selected{border-color:var(--org-accent,#4f46e5);box-shadow:0 0 0 2px var(--org-accent,#4f46e5),0 16px 38px var(--org-shadow-strong,rgba(15,23,42,.16))}
 .org-pro-card.is-highlighted{
@@ -196,11 +213,47 @@
   flex:0 0 auto;
   object-fit:cover;
   border-radius:50%;
+  --org-avatar-radius:50%;
   border:0;
   background:var(--org-hover,#eef2f7);
   box-shadow:0 0 0 2px var(--org-card,#fff),0 0 0 4px var(--org-accent-soft,rgba(79,70,229,.14));
 }
 .org-pro-card.is-highlighted .org-pro-avatar,.org-pro-card.is-selected .org-pro-avatar{box-shadow:0 0 0 2px var(--org-card,#fff),0 0 0 4px var(--org-accent,#4f46e5)}
+.org-avatar-rounded .org-pro-avatar{border-radius:12px}
+.org-avatar-square .org-pro-avatar{border-radius:3px}
+
+/* ---- card layouts ---- */
+.org-layout-center .org-pro-card-head{
+  flex-direction:column;
+  justify-content:center;
+  gap:9px;
+  padding:16px 14px 13px;
+  text-align:center;
+}
+.org-layout-center .org-pro-card-main{align-items:center;padding-right:0;gap:2px}
+.org-layout-center .org-pro-card-name{-webkit-line-clamp:1}
+.org-layout-center .org-pro-card-details{text-align:left}
+.org-layout-compact .org-pro-avatar{display:none}
+.org-layout-compact .org-pro-card-head{padding:12px 15px}
+.org-layout-compact .org-pro-card-name{font-size:14.5px}
+
+/* ---- card shadow variants ---- */
+.org-shadow-none .org-pro-card{box-shadow:none}
+.org-shadow-soft .org-pro-card{box-shadow:0 1px 2px var(--org-shadow,rgba(15,23,42,.06)),0 5px 14px var(--org-shadow,rgba(15,23,42,.06))}
+.org-shadow-strong .org-pro-card{box-shadow:0 2px 4px rgba(15,23,42,.06),0 8px 18px var(--org-shadow,rgba(15,23,42,.10)),0 22px 48px var(--org-shadow-strong,rgba(15,23,42,.16))}
+
+/* ---- performance mode: drops blur, heavy shadows and animations ---- */
+.org-perf .org-pro-toolbar{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--org-card,#fff)}
+.org-perf .org-pro-card{
+  box-shadow:0 1px 2px var(--org-shadow,rgba(15,23,42,.08));
+  transition:none;
+}
+.org-perf .org-pro-card:hover{transform:none;box-shadow:0 0 0 1px var(--org-accent,#4f46e5)}
+.org-perf .org-pro-card.is-highlighted{animation:none}
+.org-perf .org-pro-avatar{box-shadow:none;border:1px solid var(--org-card-border,rgba(15,23,42,.10))}
+.org-perf .org-pro-kids{box-shadow:none}
+.org-perf .org-pro-root{background-image:none}
+.org-perf .org-pro-drawer{animation:none}
 .org-pro-card-main{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:3px;padding-right:20px}
 .org-pro-card-name{
   min-width:0;
@@ -419,6 +472,13 @@
 .org-pro-empty svg,.org-pro-error svg{width:38px;height:38px;fill:currentColor;opacity:.4}
 .org-pro-error{color:#dc2626}
 .org-pro-hidden{display:none!important}
+
+@media (prefers-reduced-motion: reduce){
+  .org-pro-card,.org-pro-btn,.org-pro-kids,.org-pro-info-btn svg{transition:none!important}
+  .org-pro-card.is-highlighted{animation:none!important}
+  .org-pro-drawer{animation:none!important}
+}
+.org-pro-container{will-change:transform}
 
 @media (max-width:760px){
   .org-pro-toolbar{top:10px;left:10px;right:10px;padding:7px 8px}

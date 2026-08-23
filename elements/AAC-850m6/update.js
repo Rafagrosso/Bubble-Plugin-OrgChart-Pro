@@ -60,6 +60,25 @@ function(instance, properties, context) {
       const c = hexToRgb(color);
       return "rgba(" + c.r + "," + c.g + "," + c.b + "," + a + ")";
     };
+    const raf = win.requestAnimationFrame ? win.requestAnimationFrame.bind(win) : function(fn) { return setTimeout(fn, 16); };
+    const rafThrottle = function(fn) {
+      let ticking = false;
+      let lastArgs = null;
+      return function() {
+        lastArgs = arguments;
+        if (ticking) return;
+        ticking = true;
+        raf(function() { ticking = false; fn.apply(null, lastArgs); });
+      };
+    };
+    const debounce = function(fn, wait) {
+      let timer = null;
+      return function() {
+        const args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function() { fn.apply(null, args); }, wait);
+      };
+    };
 
     /* ---------------- THEMES ---------------- */
     const makeTheme = function(t) {
@@ -93,6 +112,7 @@ function(instance, properties, context) {
         "--org-field-sep": inkA(dark ? 0.08 : 0.05)
       };
     };
+    const LEVEL_HUES = [0, 32, 64, 96, 128, 160, 200, 240, 280, 320];
     const THEMES = {
       "Executive Light": makeTheme({ bg: "#f6f8fb", text: "#0f172a", muted: "#64748b", accent: "#4f46e5", card: "#ffffff", connector: "#cbd5e1" }),
       "Corporate Blue": makeTheme({ bg: "#f3f7fc", text: "#0c1a2b", muted: "#5b7186", accent: "#1d6fd8", card: "#ffffff", connector: "#c3d3e4" }),
@@ -102,7 +122,10 @@ function(instance, properties, context) {
       "Royal Purple": makeTheme({ bg: "#f8f6fd", text: "#1e1b31", muted: "#6f6a8a", accent: "#7c3aed", card: "#ffffff", connector: "#d5cdea" }),
       "Warm Sand": makeTheme({ bg: "#faf6f0", text: "#2b1c10", muted: "#8a7461", accent: "#c2410c", card: "#fffdf9", connector: "#e0d3c2" }),
       "Ocean": makeTheme({ bg: "#eef6fa", text: "#093142", muted: "#557687", accent: "#0891b2", card: "#ffffff", connector: "#bcd6e0" }),
-      "Minimal Mono": makeTheme({ bg: "#ffffff", dot: "rgba(0,0,0,.05)", text: "#111111", muted: "#737373", accent: "#111111", card: "#ffffff", cardBorder: "rgba(0,0,0,.12)", connector: "#d4d4d4" })
+      "Minimal Mono": makeTheme({ bg: "#ffffff", dot: "rgba(0,0,0,.05)", text: "#111111", muted: "#737373", accent: "#111111", card: "#ffffff", cardBorder: "rgba(0,0,0,.12)", connector: "#d4d4d4" }),
+      "Obsidian": makeTheme({ dark: true, bg: "#12111a", text: "#e9e6f2", muted: "#9d97b3", accent: "#a78bfa", accentContrast: "#1a1030", card: "#1c1a29", cardBorder: "rgba(255,255,255,.09)", connector: "#332f47" }),
+      "Nordic": makeTheme({ bg: "#f2f5f7", dot: "rgba(46,62,79,.06)", text: "#2e3e4f", muted: "#6b7f92", accent: "#5e81ac", card: "#fbfcfd", connector: "#c8d4de" }),
+      "Rose": makeTheme({ bg: "#fdf5f7", text: "#3d1f2b", muted: "#8a6673", accent: "#be123c", card: "#ffffff", connector: "#e8ccd5" })
     };
 
     const icon = {
@@ -118,7 +141,9 @@ function(instance, properties, context) {
       image: '<svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.5 8.5A1.5 1.5 0 1 1 7 7a1.5 1.5 0 0 1 1.5 1.5zM5 18l4.2-5.2 3 3.6 2-2.4L19 18z"/></svg>',
       drag: '<svg viewBox="0 0 24 24"><path d="M13 6.99h3L12 3 8 6.99h3v4.01H6.99v-3L3 12l3.99 4v-3H11v4.01H8L12 21l4-3.99h-3V13h4.01v3L21 12l-3.99-4v3H13z"/></svg>',
       chevron: '<svg viewBox="0 0 24 24"><path d="M12 15.4 5.6 9 7 7.6l5 5 5-5L18.4 9z"/></svg>',
-      people: '<svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0a8 8 0 0 0-1 .07 4.2 4.2 0 0 1 2 3.43V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg>'
+      people: '<svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0a8 8 0 0 0-1 .07 4.2 4.2 0 0 1 2 3.43V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg>',
+      zoomIn: '<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>',
+      zoomOut: '<svg viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></svg>'
     };
 
     setStatus("loading", "");
@@ -136,6 +161,40 @@ function(instance, properties, context) {
     /* ---------------- CONFIG ---------------- */
     const config = {
       theme: str(properties.visual_theme || "Executive Light"),
+      cardLayout: (function(v) {
+        if (v.indexOf("centraliz") >= 0 || v.indexOf("center") >= 0) return "center";
+        if (v.indexOf("compact") >= 0) return "compact";
+        return "classic";
+      })(str(properties.card_layout || "").toLowerCase()),
+      avatarShape: (function(v) {
+        if (v.indexOf("quadrad") >= 0 || v.indexOf("square") >= 0) return "square";
+        if (v.indexOf("arredond") >= 0 || v.indexOf("rounded") >= 0) return "rounded";
+        return "circle";
+      })(str(properties.avatar_shape || "").toLowerCase()),
+      connectorStyle: (function(v) {
+        if (v.indexOf("curva") >= 0 || v.indexOf("curve") >= 0) return "curved";
+        if (v.indexOf("reta") >= 0 || v.indexOf("straight") >= 0) return "straight";
+        return "elbow";
+      })(str(properties.connector_style || "").toLowerCase()),
+      accentPosition: (function(v) {
+        if (v.indexOf("lateral") >= 0 || v.indexOf("left") >= 0 || v.indexOf("side") >= 0) return "side";
+        if (v.indexOf("sem") >= 0 || v.indexOf("none") >= 0) return "none";
+        return "top";
+      })(str(properties.accent_position || "").toLowerCase()),
+      cardShadow: (function(v) {
+        if (v.indexOf("nenhum") >= 0 || v.indexOf("none") >= 0) return "none";
+        if (v.indexOf("forte") >= 0 || v.indexOf("strong") >= 0) return "strong";
+        if (v.indexOf("suave") >= 0 || v.indexOf("soft") >= 0) return "soft";
+        return "medium";
+      })(str(properties.card_shadow || "").toLowerCase()),
+      levelColors: bool(properties.level_colors, false),
+      showZoomControls: bool(properties.show_zoom_controls, true),
+      perfMode: (function(v) {
+        if (v.indexOf("sempre") >= 0 || v.indexOf("always") >= 0 || v.indexOf("on") === 0) return "on";
+        if (v.indexOf("deslig") >= 0 || v.indexOf("off") >= 0 || v.indexOf("never") >= 0) return "off";
+        return "auto";
+      })(str(properties.performance_mode || "").toLowerCase()),
+      perfThreshold: num(properties.performance_threshold, 150, 20, 5000),
       showSearch: bool(properties.show_search, true),
       showOrientation: bool(properties.show_orientation, true),
       showExportPdf: bool(properties.show_export_pdf, true),
@@ -203,7 +262,12 @@ function(instance, properties, context) {
     canvas.innerHTML = "";
     const wrapper = doc.createElement("div");
     wrapper.id = uid;
-    wrapper.className = "org-pro-root" + (config.orientation === "horizontal" ? " org-h" : "");
+    wrapper.className = "org-pro-root"
+      + (config.orientation === "horizontal" ? " org-h" : "")
+      + " org-layout-" + config.cardLayout
+      + " org-avatar-" + config.avatarShape
+      + " org-accent-" + config.accentPosition
+      + " org-shadow-" + config.cardShadow;
     const themeVars = THEMES[config.theme] || null;
     if (themeVars) {
       Object.keys(themeVars).forEach(function(k) { wrapper.style.setProperty(k, themeVars[k]); });
@@ -273,6 +337,12 @@ function(instance, properties, context) {
             (config.showExportPdf ? '<button class="org-pro-btn" id="' + uid + '_pdf_btn" title="Exportar PDF">' + icon.pdf + '</button>' : "") +
             '</div>'
           : "") +
+        (config.showZoomControls
+          ? '<div class="org-pro-seg" title="Zoom">' +
+            '<button class="org-pro-btn" id="' + uid + '_zoomout_btn" title="Afastar">' + icon.zoomOut + '</button>' +
+            '<span class="org-pro-zoom-level" id="' + uid + '_zoom_level">100%</span>' +
+            '<button class="org-pro-btn" id="' + uid + '_zoomin_btn" title="Aproximar">' + icon.zoomIn + '</button></div>'
+          : "") +
         (config.showDrag ? '<div class="org-pro-divider"></div><button class="org-pro-btn" id="' + uid + '_drag_btn" title="Mover cards">' + icon.drag + '<span class="org-pro-btn-label">Mover</span></button>' : "");
       wrapper.appendChild(toolbar);
 
@@ -296,6 +366,8 @@ function(instance, properties, context) {
       if (qs("vertical_btn")) qs("vertical_btn").onclick = function() { setOrientation("vertical"); };
       if (qs("horizontal_btn")) qs("horizontal_btn").onclick = function() { setOrientation("horizontal"); };
       if (qs("drag_btn")) qs("drag_btn").onclick = function() { setDragActive(!dragActive); };
+      if (qs("zoomin_btn")) qs("zoomin_btn").onclick = function() { zoomBy(1.25); };
+      if (qs("zoomout_btn")) qs("zoomout_btn").onclick = function() { zoomBy(0.8); };
       updateToolbarState();
     }
     renderToolbar();
@@ -431,12 +503,16 @@ function(instance, properties, context) {
     }
     if (warnings.length) showToast(warnings.length + " aviso(s) nos dados");
 
+    const perfActive = config.perfMode === "on" || (config.perfMode === "auto" && renderedNodes.length >= config.perfThreshold);
+    if (perfActive) wrapper.classList.add("org-perf");
+    safePublish("performance_mode_active", perfActive ? "1" : "0");
+
     if (!instance.data._collapsed_initialized) {
       if (config.initialDisplay === "collapsed") {
         renderedNodes.forEach(function(n) {
           if ((childMap[n.id] || []).length) collapsedMap[n.id] = true;
         });
-      } else if (config.initialDisplay === "levels" || config.initialLevels > 0) {
+      } else if (config.initialDisplay === "levels") {
         const lv = Math.max(1, config.initialLevels);
         renderedNodes.forEach(function(n) {
           if ((childMap[n.id] || []).length && n.depth >= lv) collapsedMap[n.id] = true;
@@ -455,11 +531,16 @@ function(instance, properties, context) {
       .attr("height", "100%")
       .attr("viewBox", [0, 0, width, height]);
     container = svg.append("g").attr("class", "org-pro-container");
-    zoom = D3.zoom().scaleExtent([0.12, 3.5]).on("zoom", function(e) {
-      container.attr("transform", e.transform);
+    const publishZoom = debounce(function(k) {
+      safePublish("current_zoom", String(Math.round(k * 100) / 100));
+    }, 180);
+    const applyTransform = rafThrottle(function(t) { container.attr("transform", t); });
+    zoom = D3.zoom().scaleExtent([0.08, 3.5]).on("zoom", function(e) {
+      applyTransform(e.transform);
       svg.node().__zoom = e.transform;
       instance.data._saved_transform = e.transform;
-      safePublish("current_zoom", String(Math.round(e.transform.k * 100) / 100));
+      updateZoomLabel(e.transform.k);
+      publishZoom(e.transform.k);
     });
     svg.call(zoom);
     svg.on("mousedown.cursor", function() { svg.classed("is-grabbing", true); });
@@ -470,6 +551,19 @@ function(instance, properties, context) {
     });
 
     /* ---------------- LAYOUT ---------------- */
+    const isDarkTheme = ["Midnight", "Graphite", "Obsidian"].indexOf(config.theme) >= 0;
+    const baseHue = (function() {
+      const c = hexToRgb(themeVars ? themeVars["--org-accent"] : toCssColor(properties.accent_color, "#4f46e5"));
+      const r = c.r / 255, g = c.g / 255, b = c.b / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), dl = mx - mn;
+      if (!dl) return 220;
+      let h;
+      if (mx === r) h = ((g - b) / dl) % 6;
+      else if (mx === g) h = (b - r) / dl + 2;
+      else h = (r - g) / dl + 4;
+      return Math.round(h * 60 + 360) % 360;
+    })();
+
     function buildTree(n) {
       const kids = childMap[n.id] || [];
       return Object.assign({}, n, { children: collapsedMap[n.id] ? null : kids.map(buildTree) });
@@ -504,6 +598,26 @@ function(instance, properties, context) {
     }
     function linkPath(d) {
       let sx, sy, tx, ty;
+      if (config.connectorStyle === "straight") {
+        if (config.orientation === "vertical") {
+          return "M" + d.source.x + "," + (d.source.y + config.nodeH / 2 + config.cardVOffset) +
+                 " L" + d.target.x + "," + (d.target.y - config.nodeH / 2 + config.cardVOffset);
+        }
+        return "M" + (d.source.y + config.nodeW / 2 + config.cardHOffset) + "," + (d.source.x + config.cardVOffset) +
+               " L" + (d.target.y - config.nodeW / 2 + config.cardHOffset) + "," + (d.target.x + config.cardVOffset);
+      }
+      if (config.connectorStyle === "curved") {
+        if (config.orientation === "vertical") {
+          const csx = d.source.x, csy = d.source.y + config.nodeH / 2 + config.cardVOffset;
+          const ctx = d.target.x, cty = d.target.y - config.nodeH / 2 + config.cardVOffset;
+          const cmy = (csy + cty) / 2;
+          return "M" + csx + "," + csy + " C" + csx + "," + cmy + " " + ctx + "," + cmy + " " + ctx + "," + cty;
+        }
+        const hsx = d.source.y + config.nodeW / 2 + config.cardHOffset, hsy = d.source.x + config.cardVOffset;
+        const htx = d.target.y - config.nodeW / 2 + config.cardHOffset, hty = d.target.x + config.cardVOffset;
+        const hmx = (hsx + htx) / 2;
+        return "M" + hsx + "," + hsy + " C" + hmx + "," + hsy + " " + hmx + "," + hty + " " + htx + "," + hty;
+      }
       if (config.orientation === "vertical") {
         sx = d.source.x;
         sy = d.source.y + config.nodeH / 2 + config.cardVOffset;
@@ -550,10 +664,11 @@ function(instance, properties, context) {
             return '<div class="org-pro-card-field"><div class="org-pro-card-field-label">' + esc(f.label) + '</div><div class="org-pro-card-field-value">' + esc(f.value) + '</div></div>';
           }).join("") + '</div>'
         : "";
+      const levelStyle = config.levelColors ? ' style="--org-accent:hsl(' + ((LEVEL_HUES[((n.depth || 1) - 1) % LEVEL_HUES.length] + baseHue) % 360) + ' 70% ' + (isDarkTheme ? "62%" : "48%") + ')"' : "";
       return '<div xmlns="http://www.w3.org/1999/xhtml" class="org-pro-card' +
-        (highlighted ? " is-highlighted" : "") + (selected ? " is-selected" : "") + (infoOpen ? " is-info-open" : "") + '">' +
+        (highlighted ? " is-highlighted" : "") + (selected ? " is-selected" : "") + (infoOpen ? " is-info-open" : "") + '"' + levelStyle + '>' +
         '<div class="org-pro-card-head">' +
-          '<img class="org-pro-avatar" src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';" style="width:' + config.avatarSize + 'px;height:' + config.avatarSize + 'px">' +
+          '<img class="org-pro-avatar" loading="lazy" decoding="async" src="' + esc(n.avatar || FALLBACK_AVATAR) + '" onerror="this.onerror=null;this.src=\'' + esc(FALLBACK_AVATAR) + '\';" style="width:' + config.avatarSize + 'px;height:' + config.avatarSize + 'px">' +
           '<div class="org-pro-card-main">' +
             '<div class="org-pro-card-name">' + esc(n.name || "(sem nome)") + '</div>' +
             (n.role ? '<div class="org-pro-card-role">' + esc(n.role) + '</div>' : "") +
@@ -655,11 +770,11 @@ function(instance, properties, context) {
     }
 
     /* ---------------- OUTPUTS ---------------- */
-    function publishAllPositions() {
+    const publishAllPositions = debounce(function() {
       safePublish("all_positions_json", JSON.stringify(allPositions));
       safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
       safeTrigger("organograma_positions_changed");
-    }
+    }, 120);
     function currentPositions() {
       return renderedNodes.filter(function(n) { return Number.isFinite(n._manualX) && Number.isFinite(n._manualY); }).map(function(n) {
         return { id: n.id, x: Math.round(n._manualX * 100) / 100, y: Math.round(n._manualY * 100) / 100 };
@@ -886,6 +1001,13 @@ function(instance, properties, context) {
         svg.transition().duration(480).ease(D3.easeCubicOut).call(zoom.transform, nt);
       } catch (e) {}
     }
+    function zoomBy(factor) {
+      try { svg.transition().duration(220).call(zoom.scaleBy, factor); } catch (e) {}
+    }
+    function updateZoomLabel(k) {
+      const el = wrapper.querySelector("#" + uid + "_zoom_level");
+      if (el) el.textContent = Math.round(k * 100) + "%";
+    }
     function fitToChart(animated) {
       try {
         const bbox = container.node().getBBox();
@@ -921,6 +1043,17 @@ function(instance, properties, context) {
       svg.on("mouseup.dragCard", endCardDrag);
       safeTrigger("organograma_drag_started");
     }
+    const applyDragFrame = rafThrottle(function() {
+      container.selectAll(".org-pro-node").attr("transform", function(d) {
+        const node = nodeMap[d.data.id];
+        if (node && Number.isFinite(node._manualX) && Number.isFinite(node._manualY)) {
+          d.x = node._manualX;
+          d.y = node._manualY;
+        }
+        return nodeTransform(d);
+      });
+      container.selectAll(".org-pro-link").attr("d", linkPath);
+    });
     function moveCardDrag(event) {
       if (!dragState) return;
       const pt = D3.pointer(event, svg.node());
@@ -933,15 +1066,7 @@ function(instance, properties, context) {
         node._manualX = item.x + (config.orientation === "vertical" ? dx : dy);
         node._manualY = item.y + (config.orientation === "vertical" ? dy : dx);
       });
-      container.selectAll(".org-pro-node").attr("transform", function(d) {
-        const node = nodeMap[d.data.id];
-        if (node && Number.isFinite(node._manualX) && Number.isFinite(node._manualY)) {
-          d.x = node._manualX;
-          d.y = node._manualY;
-        }
-        return nodeTransform(d);
-      });
-      container.selectAll(".org-pro-link").attr("d", linkPath);
+      applyDragFrame();
     }
     function endCardDrag() {
       if (!dragState) return;
@@ -1041,9 +1166,15 @@ function(instance, properties, context) {
       exportPng: function() { exportChart("png"); },
       getPositions: currentPositions,
       getAllPositions: function() { return allPositions.slice(); },
+      zoomIn: function() { zoomBy(1.25); },
+      zoomOut: function() { zoomBy(0.8); },
+      zoomTo: function(k) { try { svg.transition().duration(220).call(zoom.scaleTo, Number(k) || 1); } catch (e) {} },
       instanceId: uid
     };
+    updateZoomLabel((svg.node().__zoom || D3.zoomIdentity).k);
     safePublish("api_instance_id", uid);
+    safePublish("all_positions_json", JSON.stringify(allPositions));
+    safePublish("collapsed_ids_json", JSON.stringify(Object.keys(collapsedMap).filter(function(k) { return collapsedMap[k]; })));
     safePublish("positions_json", JSON.stringify(currentPositions()));
     setStatus("ready", "");
     safeTrigger("organograma_rendered");

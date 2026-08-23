@@ -400,11 +400,11 @@
         "ACB": {
             "caption": "Visual Theme",
             "default_val": "Executive Light",
-            "doc": "Modelos visuais profissionais prontos. Escolha Custom para usar as cores manuais abaixo.",
+            "doc": "12 modelos visuais profissionais prontos (3 escuros: Midnight, Graphite, Obsidian). Escolha Custom para usar as cores manuais abaixo.",
             "editor": "Dropdown",
             "name": "visual_theme",
             "optional": true,
-            "options": "Executive Light,Corporate Blue,Midnight,Graphite,Emerald,Royal Purple,Warm Sand,Ocean,Minimal Mono,Custom",
+            "options": "Executive Light,Corporate Blue,Nordic,Ocean,Emerald,Royal Purple,Rose,Warm Sand,Minimal Mono,Midnight,Graphite,Obsidian,Custom",
             "rank": 39
         },
         "ACC": {
@@ -461,7 +461,7 @@
             "caption": "CARD",
             "editor": "Label",
             "name": "secao_card",
-            "rank": 47
+            "rank": 53
         },
         "ACJ": {
             "caption": "Show Card Info Toggle",
@@ -469,7 +469,7 @@
             "doc": "Mostra o ícone no card para expandir/recolher as informações extras (Fields 1-5) dentro do próprio card.",
             "editor": "Checkbox",
             "name": "card_info_toggle",
-            "rank": 48
+            "rank": 54
         },
         "ACK": {
             "caption": "Avatar Size",
@@ -478,7 +478,7 @@
             "editor": "StaticNumber",
             "name": "card_avatar_size",
             "optional": true,
-            "rank": 49
+            "rank": 55
         },
         "ACL": {
             "caption": "Level Spacing",
@@ -487,34 +487,34 @@
             "editor": "StaticNumber",
             "name": "level_spacing",
             "optional": true,
-            "rank": 50
+            "rank": 56
         },
         "ACM": {
             "caption": "TOOLBAR E AÇÕES",
             "editor": "Label",
             "name": "secao_toolbar",
-            "rank": 51
+            "rank": 57
         },
         "ACN": {
             "caption": "Show Fit Button",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_fit_button",
-            "rank": 52
+            "rank": 58
         },
         "ACO": {
             "caption": "Show Expand/Collapse Buttons",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_expand_collapse_buttons",
-            "rank": 53
+            "rank": 59
         },
         "ACP": {
             "caption": "Show Export PNG",
             "default_val": true,
             "editor": "Checkbox",
             "name": "show_export_png",
-            "rank": 54
+            "rank": 60
         },
         "ACQ": {
             "caption": "Show Details Panel",
@@ -522,7 +522,7 @@
             "doc": "Habilita o painel lateral com os detalhes do card.",
             "editor": "Checkbox",
             "name": "show_details_panel",
-            "rank": 55
+            "rank": 61
         },
         "ACR": {
             "caption": "Open Panel on Click",
@@ -530,7 +530,7 @@
             "doc": "Abre o painel lateral ao clicar em um card.",
             "editor": "Checkbox",
             "name": "open_panel_on_click",
-            "rank": 56
+            "rank": 65
         },
         "ACS": {
             "caption": "Open Panel on Search",
@@ -538,7 +538,7 @@
             "doc": "Abre o painel lateral automaticamente ao encontrar um resultado de busca.",
             "editor": "Checkbox",
             "name": "open_panel_on_search",
-            "rank": 57
+            "rank": 66
         },
         "ACT": {
             "caption": "Drag Moves Subtree",
@@ -546,13 +546,13 @@
             "doc": "Ao arrastar um card, move também toda a equipe abaixo dele.",
             "editor": "Checkbox",
             "name": "drag_subtree",
-            "rank": 58
+            "rank": 67
         },
         "ACU": {
             "caption": "BUSCA",
             "editor": "Label",
             "name": "secao_busca",
-            "rank": 59
+            "rank": 68
         },
         "ACV": {
             "caption": "Search Fields",
@@ -561,13 +561,13 @@
             "editor": "StaticText",
             "name": "search_fields",
             "optional": true,
-            "rank": 60
+            "rank": 69
         },
         "ACW": {
             "caption": "EXPORTAÇÃO E OUTROS",
             "editor": "Label",
             "name": "secao_export",
-            "rank": 61
+            "rank": 70
         },
         "ACX": {
             "caption": "Export Scale",
@@ -576,7 +576,7 @@
             "editor": "StaticNumber",
             "name": "export_scale",
             "optional": true,
-            "rank": 62
+            "rank": 71
         },
         "ACY": {
             "caption": "Export Filename Prefix",
@@ -585,7 +585,7 @@
             "editor": "StaticText",
             "name": "export_filename_prefix",
             "optional": true,
-            "rank": 63
+            "rank": 72
         },
         "ACZ": {
             "caption": "Empty Message",
@@ -594,7 +594,7 @@
             "editor": "StaticText",
             "name": "empty_message",
             "optional": true,
-            "rank": 64
+            "rank": 73
         },
         "ACa": {
             "caption": "Fallback Avatar URL",
@@ -602,7 +602,7 @@
             "editor": "StaticText",
             "name": "fallback_avatar_url",
             "optional": true,
-            "rank": 65
+            "rank": 74
         },
         "ACb": {
             "caption": "Initial Display",
@@ -613,6 +613,81 @@
             "optional": true,
             "options": "Tudo expandido,Tudo recolhido,Expandir até o nível",
             "rank": 44
+        },
+        "ACc": {
+            "caption": "Card Layout",
+            "default_val": "Clássico (avatar à esquerda)",
+            "doc": "Disposição do conteúdo dentro do card.",
+            "editor": "Dropdown",
+            "name": "card_layout",
+            "optional": true,
+            "options": "Clássico (avatar à esquerda),Centralizado (avatar em cima),Compacto (sem avatar)",
+            "rank": 47
+        },
+        "ACd": {
+            "caption": "Avatar Shape",
+            "default_val": "Círculo",
+            "doc": "Formato da foto do colaborador.",
+            "editor": "Dropdown",
+            "name": "avatar_shape",
+            "optional": true,
+            "options": "Círculo,Arredondado,Quadrado",
+            "rank": 48
+        },
+        "ACe": {
+            "caption": "Accent Bar Position",
+            "default_val": "Barra superior",
+            "doc": "Onde fica a faixa colorida de destaque do card.",
+            "editor": "Dropdown",
+            "name": "accent_position",
+            "optional": true,
+            "options": "Barra superior,Barra lateral,Sem barra",
+            "rank": 49
+        },
+        "ACf": {
+            "caption": "Card Shadow",
+            "default_val": "Média",
+            "doc": "Intensidade da sombra dos cards.",
+            "editor": "Dropdown",
+            "name": "card_shadow",
+            "optional": true,
+            "options": "Suave,Média,Forte,Nenhuma",
+            "rank": 50
+        },
+        "ACg": {
+            "caption": "Color by Level",
+            "default_val": false,
+            "doc": "Usa uma cor de destaque diferente para cada nível hierárquico, derivada da cor do tema.",
+            "editor": "Checkbox",
+            "name": "level_colors",
+            "rank": 51
+        },
+        "ACh": {
+            "caption": "Show Zoom Controls",
+            "default_val": true,
+            "doc": "Exibe os botões de aproximar/afastar e o percentual de zoom na toolbar.",
+            "editor": "Checkbox",
+            "name": "show_zoom_controls",
+            "rank": 62
+        },
+        "ACi": {
+            "caption": "Performance Mode",
+            "default_val": "Automático",
+            "doc": "Desativa blur, sombras pesadas e animações para acelerar organogramas grandes. No Automático, liga sozinho acima do limite abaixo.",
+            "editor": "Dropdown",
+            "name": "performance_mode",
+            "optional": true,
+            "options": "Automático,Sempre ligado,Desligado",
+            "rank": 63
+        },
+        "ACj": {
+            "caption": "Performance Mode Threshold",
+            "default_val": 150,
+            "doc": "A partir de quantos cards o Modo Performance liga sozinho (quando Performance Mode = Automático).",
+            "editor": "StaticNumber",
+            "name": "performance_threshold",
+            "optional": true,
+            "rank": 64
         }
     },
     "icon": "ion-android-checkbox-blank",
@@ -806,6 +881,15 @@
             },
             "name": "warning_count",
             "value": "number"
+        },
+        "ADO": {
+            "caption": "performance_mode_active",
+            "doc": "1 quando o Modo Performance está ativo, 0 quando não está.",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "performance_mode_active",
+            "value": "text"
         }
     },
     "support_autobinding": false
